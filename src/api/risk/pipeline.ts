@@ -30,7 +30,10 @@ export interface RiskPipeline {
 
 export class DefaultRiskPipeline implements RiskPipeline {
   async run(input: RiskPipelineInput): Promise<RiskPipelineOutput> {
+    // Rule engine uses normalised text (must detect PII keywords like "OTP", "CCCD")
     const text = input.preprocessed.normalised.lower;
+    // LLM receives REDACTED text only — zero PII to external services
+    const redactedText = input.preprocessed.redacted.text;
 
     // 1. Rule engine
     const signals = evaluateRules(text);
@@ -41,8 +44,8 @@ export class DefaultRiskPipeline implements RiskPipeline {
       input.ragIndex,
     );
 
-    // 3. LLM explanation
-    const llmResponse = await generateExplanation(signals, text, ragRetrieval.alerts);
+    // 3. LLM explanation (uses REDACTED text — zero PII leaves the device)
+    const llmResponse = await generateExplanation(signals, redactedText, ragRetrieval.alerts);
 
     // 4. Risk scoring
     const riskLevel = scoreRisk(signals);
@@ -57,7 +60,7 @@ export class DefaultRiskPipeline implements RiskPipeline {
       disclaimer:
         'AI chỉ hỗ trợ nhận diện dấu hiệu, không thay cô/chú quyết định và không đưa lời khuyên y tế/pháp lý/tài chính.',
       trace: {
-        inputHash: this.hashInput(text),
+        inputHash: this.hashInput(redactedText),
         rulesMatched: signals,
         llmPrompt: { system: 'REDACTED', user: 'REDACTED' }, // privacy
         llmResponse,
