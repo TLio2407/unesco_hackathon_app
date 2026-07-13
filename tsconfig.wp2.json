@@ -4,6 +4,7 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "lib": ["ES2021"],
+    "resolveJsonModule": true,
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
