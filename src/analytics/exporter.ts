@@ -36,7 +36,7 @@ export class AnalyticsExporter {
         escapeCsv(e.kind),
         escapeCsv(e.sessionId),
         String(e.timestamp),
-        escapeCsv(meta.riskLevel ?? ''),
+        escapeCsv(String(meta.riskLevel ?? '')),
         String(meta.redFlagCount ?? ''),
         String(meta.lessonShown ?? ''),
       ].join(',');
@@ -60,7 +60,7 @@ export class AnalyticsExporter {
     for (const e of analysisEvents) {
       const rl = filterMeta(e.metadata).riskLevel;
       if (rl) {
-        riskDistribution[rl] = (riskDistribution[rl] ?? 0) + 1;
+        riskDistribution[String(rl)] = (riskDistribution[String(rl)] ?? 0) + 1;
       }
     }
 
