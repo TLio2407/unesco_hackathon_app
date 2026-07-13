@@ -102,7 +102,7 @@ export class DefaultInputProcessor implements InputProcessor {
     try {
       new URL(normalized);
     } catch {
-      throw new InputValidationError('INVALID_URL', `Cannot parse URL: ${raw.url}`);
+      throw new InputValidationError('INVALID_URL', 'Cannot parse URL');
     }
 
     return {
