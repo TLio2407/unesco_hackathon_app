@@ -1,0 +1,51 @@
+{
+  "common": {
+    "appName": "SilverTrust",
+    "tagline": "Your trusted AI MIL companion for safer digital decisions",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close",
+    "loading": "Processing...",
+    "error": "Something went wrong",
+    "retry": "Retry"
+  },
+  "companion": {
+    "title": "Decision Assistant",
+    "inputPlaceholder": "Paste text, link, or screenshot...",
+    "submit": "Analyze",
+    "sourceText": "Enter text",
+    "sourceUrl": "Enter URL",
+    "sourceImage": "Upload screenshot",
+    "result": {
+      "safe": "Safe",
+      "caution": "Use Caution",
+      "highRisk": "High Risk",
+      "insufficientData": "Insufficient Data",
+      "verificationSteps": "Verification Steps",
+      "nextAction": "Next Action",
+      "redFlags": "Red Flags",
+      "lesson": "Mini Lesson",
+      "disclaimer": "AI assists with red-flag detection only. It does not replace your judgment or provide medical, legal, or financial advice."
+    },
+    "trustedCircle": "Ask a Trusted Person",
+    "trustedCircleDesc": "Send a summary to a trusted family member"
+  },
+  "alert": {
+    "title": "Scam Alerts",
+    "placeholder": "Scam alert feed will be updated soon."
+  },
+  "community": {
+    "title": "Community",
+    "placeholder": "Find MIL workshops and events near you."
+  },
+  "learning": {
+    "title": "My Lessons",
+    "placeholder": "Micro MIL lessons will appear here after each analysis."
+  },
+  "circle": {
+    "title": "Trusted Circle",
+    "placeholder": "Share a redacted situation summary with a trusted contact.",
+    "shareButton": "Share via Zalo/Telegram",
+    "redactedNotice": "Sensitive info has been redacted"
+  }
+}
