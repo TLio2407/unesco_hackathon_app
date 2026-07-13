@@ -1,0 +1,46 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "comment": "SilverTrust MIL Companion — Company Architect project config. Run scripts/configure-agent-models.sh to set per-tier models interactively before each session.",
+  "agent": {
+    "company": {
+      "mode": "primary",
+      "description": "Company Architect — full lifecycle with German 3-layer governance. See .opencode/agents/company-worker/prompt.md for details.",
+      "prompt": "You are the Company Architect for SilverTrust. Read .opencode-state/sessions/<id>/context-brief.md and .agent/skills/company-arch-workflow/SKILL.md before delegating. NEVER use 'general' subagent type — use only company-* and swarm-* agents."
+    },
+    "company-worker": {
+      "mode": "subagent",
+      "prompt": "file:.opencode/agents/company-worker/prompt.md",
+      "permission": { "read": "allow", "edit": "allow", "glob": "allow", "grep": "allow", "list": "allow", "bash": "allow", "task": "allow" }
+    },
+    "company-reviewer": {
+      "mode": "subagent",
+      "prompt": "file:.opencode/agents/company-reviewer/prompt.md",
+      "permission": { "read": "allow", "edit": "allow", "glob": "allow", "grep": "allow", "list": "allow", "bash": "allow", "task": "allow" }
+    },
+    "company-auditor": {
+      "mode": "subagent",
+      "description": "Regulatory compliance auditor (GDPR, ISO 9001, accessibility, whistleblower). Reads .opencode-state/betriebsrat/.",
+      "permission": { "read": "allow", "edit": "allow", "glob": "allow", "grep": "allow", "list": "allow", "bash": "allow", "task": "allow" }
+    },
+    "company-benchmarker": {
+      "mode": "subagent",
+      "description": "Industry comparison against OWASP, AWS WAF, Azure, Cloudflare best practices.",
+      "permission": { "read": "allow", "edit": "allow", "glob": "allow", "grep": "allow", "list": "allow", "bash": "allow", "task": "allow" }
+    },
+    "company-betriebsrat": {
+      "mode": "subagent",
+      "description": "Works Council — co-determination, veto rights, whistleblower. Reads/writes .opencode-state/betriebsrat/.",
+      "permission": { "read": "allow", "edit": "allow", "glob": "allow", "grep": "allow", "list": "allow", "bash": "allow", "task": "allow" }
+    },
+    "company-integrator": {
+      "mode": "subagent",
+      "description": "Cross-WP process excellence (Lean). Value stream mapping, bottleneck elimination.",
+      "permission": { "read": "allow", "edit": "allow", "glob": "allow", "grep": "allow", "list": "allow", "bash": "allow", "task": "allow" }
+    },
+    "company-analyst": {
+      "mode": "subagent",
+      "description": "Retrospective PDCA — failure patterns, efficiency trends, prompt improvements.",
+      "permission": { "read": "allow", "edit": "allow", "glob": "allow", "grep": "allow", "list": "allow", "bash": "allow", "task": "allow" }
+    }
+  }
+}
