@@ -1,4 +1,5 @@
 import { Image } from 'expo-image';
+import { router } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
 import { Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -8,8 +9,17 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Collapsible } from '@/components/ui/collapsible';
 import { WebBadge } from '@/components/web-badge';
+import { t } from '@/i18n';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { Accessibility } from '@/theme/tokens';
 import { useTheme } from '@/hooks/use-theme';
+
+const MODULES = [
+  { key: 'alert', route: '/alert' },
+  { key: 'community', route: '/community' },
+  { key: 'learning', route: '/learning' },
+  { key: 'circle', route: '/circle' },
+] as const;
 
 export default function TabTwoScreen() {
   const safeAreaInsets = useSafeAreaInsets();
@@ -56,6 +66,19 @@ export default function TabTwoScreen() {
               </ThemedView>
             </Pressable>
           </ExternalLink>
+        </ThemedView>
+
+        <ThemedView style={styles.moduleHub}>
+          {MODULES.map((m) => (
+            <Pressable
+              key={m.key}
+              style={({ pressed }) => [styles.moduleButton, pressed && styles.modulePressed]}
+              onPress={() => router.push(m.route)}
+              accessibilityRole="button"
+              accessibilityLabel={t(`${m.key}.title`)}>
+              <ThemedText style={styles.moduleLabel}>{t(`${m.key}.title`)}</ThemedText>
+            </Pressable>
+          ))}
         </ThemedView>
 
         <ThemedView style={styles.sectionsWrapper}>
@@ -162,6 +185,27 @@ const styles = StyleSheet.create({
     gap: Spacing.five,
     paddingHorizontal: Spacing.four,
     paddingTop: Spacing.three,
+  },
+  moduleHub: {
+    gap: Spacing.two,
+    paddingHorizontal: Spacing.four,
+  },
+  moduleButton: {
+    minHeight: Accessibility.minTouchSize,
+    minWidth: Accessibility.minTouchSize,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: Spacing.four,
+    borderWidth: 2,
+    borderColor: Accessibility.colors.primaryAction,
+    backgroundColor: Accessibility.colors.surfaceCard,
+    paddingHorizontal: Spacing.four,
+  },
+  modulePressed: { opacity: 0.8 },
+  moduleLabel: {
+    fontSize: Accessibility.fontSize.normal,
+    fontWeight: '600',
+    color: Accessibility.colors.primaryAction,
   },
   collapsibleContent: {
     alignItems: 'center',
