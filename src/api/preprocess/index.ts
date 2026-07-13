@@ -1,13 +1,30 @@
 /**
- * @module api/preprocess — PreprocessInput staging contract
+ * WP2 — Pre-processing Layer
  *
- * Minimal type stub for the preprocess layer consumed by WP3 (risk reasoning).
- * Once WP2 lands in main, this file is replaced by src/api/preprocess/index.ts
- * from feat/wp2-preprocess.
+ * ┌──────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────────┐
+ * │ InputBag │────▶│  Normaliser  │────▶│   Entities   │────▶│     Redact       │──▶ WP3
+ * └──────────┘     └──────────────┘     └──────────────┘     └──────────────────┘
+ *
+ * @module api/preprocess
  */
-export interface PreprocessedInput {
-  original: any;
-  normalised: { cleaned: string; ascii: string; lower: string };
-  entities: any;
-  redacted: { text: string; redactions: any[]; count: number };
-}
+
+export { normalise, foldDiacritics, collapseWhitespace, stripInvisible } from './normalizer';
+export type { NormalisedText } from './normalizer';
+
+export { extractEntities, extractPhones, extractCccd, extractEmails, extractMoney, extractUrls } from './entities';
+export type {
+  ExtractedEntity,
+  VnPhone,
+  VnCccd,
+  VnBankAccount,
+  EmailAddress,
+  VnMoney,
+  WebUrl,
+  ExtractionResult,
+} from './entities';
+
+export { redactPii } from './redact';
+export type { PiiKind, Redaction, RedactResult } from './redact';
+
+export { DefaultPreprocessPipeline } from './pipeline';
+export type { PreprocessPipeline, PreprocessedInput } from './pipeline';

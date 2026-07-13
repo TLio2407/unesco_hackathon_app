@@ -3,7 +3,8 @@ export type RiskLevel = 'safe' | 'caution' | 'high_risk' | 'insufficient_data';
 export type AnalysisInput =
   | { kind: 'text'; text: string }
   | { kind: 'url'; url: string }
-  | { kind: 'image'; ref: string };
+  | { kind: 'image'; ref: string }
+  | { kind: 'voice'; data: string; mimeType: string; durationMs?: number };
 
 export type RedFlagSignal =
   | 'urgency'
