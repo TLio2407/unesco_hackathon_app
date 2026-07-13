@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Company Architect — Agent Model Configurator</title>
+<style>
+  :root {
+    --bg: #0d1117; --card: #161b22; --border: #30363d;
+    --text: #e6edf3; --dim: #8b949e; --accent: #58a6ff;
+    --green: #3fb950; --red: #f85149; --amber: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font: 14px/1.6 -apple-system, BlinkMacSystemFont, sans-serif; padding: 20px; }
+  h1 { margin-bottom: 8px; }
+  .subtitle { color: var(--dim); margin-bottom: 24px; font-size: 13px; }
+  .tier { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+  .tier h3 { margin-bottom: 4px; }
+  .tier .agents { color: var(--dim); font-size: 12px; margin-bottom: 12px; }
+  .model-list { display: grid; gap: 6px; }
+  .model-row { display: flex; align-items: center; gap: 8px; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
+  .model-row:hover { background: rgba(88,166,255,0.08); }
+  .model-row.selected { background: rgba(63,185,80,0.12); border: 1px solid var(--green); }
+  .model-row .dot { width: 14px; height: 14px; border: 2px solid var(--border); border-radius: 50%; flex-shrink: 0; }
+  .model-row.selected .dot { background: var(--green); border-color: var(--green); }
+  .model-row .id { color: var(--accent); font-family: monospace; font-size: 12px; flex: 1; }
+  .model-row .label { color: var(--dim); font-size: 12px; }
+  .actions { display: flex; gap: 12px; margin-top: 24px; }
+  button { padding: 8px 20px; border: 1px solid var(--border); border-radius: 6px; background: var(--card); color: var(--text); cursor: pointer; font-size: 14px; }
+  button.primary { background: #238636; border-color: #238636; }
+  button.primary:hover { background: #2ea043; }
+  button:hover { background: #1f2937; }
+  pre { background: #0d1117; padding: 16px; border-radius: 8px; border: 1px solid var(--border); font-size: 12px; overflow-x: auto; margin-top: 16px; display: none; }
+  pre.show { display: block; }
+  .footer { color: var(--dim); font-size: 12px; margin-top: 16px; }
+  .tab-bar { display: flex; gap: 4px; margin-bottom: 16px; }
+  .tab { padding: 6px 16px; border: 1px solid var(--border); border-radius: 6px 6px 0 0; cursor: pointer; background: var(--bg); color: var(--dim); }
+  .tab.active { background: var(--card); color: var(--text); border-bottom-color: var(--card); }
+</style>
+</head>
+<body>
+<h1>Company Architect — Agent Model Configurator</h1>
+<p class="subtitle">SilverTrust MIL Companion — pick one model per agent tier. Writes to .opencode/opencode.json</p>
+
+<div id="tiers"></div>
+
+<div class="actions">
+  <button class="primary" onclick="applyAll()">Apply Default to All Tiers</button>
+  <button onclick="showJson()">Show JSON</button>
+  <button onclick="navigator.clipboard.writeText(outputJson()).then(()=>alert('Copied!'))">Copy JSON</button>
+</div>
+
+<pre id="output" class="show"></pre>
+<p class="footer">Edit the MODEL list in scripts/configure-agent-models.sh to add/remove providers.</p>
+
+<script>
+// ── Models (edit this array to match your provider list) ──────────────────
+const MODELS = [
+  { id: "9router/kg/tencent/hy3:free", label: "HY3 Free (fast, general)" },
+  { id: "9router/cmc/deepseek/deepseek-v4-pro", label: "DeepSeek V4 Pro (code-heavy)" },
+  { id: "9router/cmc/xiaomi/mimo-v2.5-pro", label: "MiMo V2.5 Pro (reasoning)" },
+  { id: "9router/oc/hy3-free", label: "HY3 OC Free" },
+  { id: "9router/oc/deepseek-v4-flash-free", label: "DeepSeek V4 Flash Free (cheap)" },
+  { id: "9router/mistral/devstral-2512", label: "Devstral 2512 (coding)" },
+  { id: "9router/kg/poolside/laguna-m.1:free", label: "Laguna M.1 Free (code)" },
+  { id: "9router/kg/stepfun/step-3.7-flash:free", label: "StepFun 3.7 Flash" },
+  { id: "9router/aa/agnes-2.0-flash", label: "Agnes 2.0 Flash" },
+  { id: "headroom/claude-haiku-4-5-20251001", label: "Claude Haiku 4.5 (fast, cheap)" },
+  { id: "headroom/claude-sonnet-4-6", label: "Claude Sonnet 4.6 (balanced)" },
+  { id: "headroom/claude-opus-4-6", label: "Claude Opus 4.6 (powerful, expensive)" },
+];
+
+// ── Agent tiers ───────────────────────────────────────────────────────────
+const TIERS = [
+  { key: "architect", agents: ["company","swarm"], label: "Orchestrator / Primary Agents" },
+  { key: "write", agents: ["company-writer","company-designer","company-strategist"], label: "Planning & Design Agents" },
+  { key: "work", agents: ["company-worker","company-team-leader"], label: "Execution Agents (cheap/fast)" },
+  { key: "review", agents: ["company-reviewer","company-auditor","company-benchmarker","company-analyst"], label: "Quality Audit Agents (powerful)" },
+  { key: "council", agents: ["company-betriebsrat","swarm-betriebsrat"], label: "Works Council Agents" },
+  { key: "integrate", agents: ["company-integrator","company-activator"], label: "Integration & Activation" },
+];
+
+// ── State ─────────────────────────────────────────────────────────────────
+const state = {};
+TIERS.forEach(t => { state[t.key] = MODELS[0].id; });
+
+// ── Render ────────────────────────────────────────────────────────────────
+function render() {
+  const container = document.getElementById("tiers");
+  container.innerHTML = TIERS.map(t => `
+    <div class="tier">
+      <h3>${t.label}</h3>
+      <div class="agents">${t.agents.join(", ")}</div>
+      <div class="model-list">
+        ${MODELS.map((m,i) => {
+          const sel = state[t.key] === m.id ? " selected" : "";
+          return `<div class="model-row${sel}" onclick="select('${t.key}','${m.id}')">
+            <div class="dot"></div>
+            <span class="id">${m.id}</span>
+            <span class="label">${m.label}</span>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>
+  `).join("");
+  showJson();
+}
+
+function select(tierKey, modelId) {
+  state[tierKey] = modelId;
+  render();
+}
+
+function applyAll() {
+  const mid = MODELS[0].id;
+  TIERS.forEach(t => { state[t.key] = mid; });
+  render();
+}
+
+function outputJson() {
+  const agents = {};
+  TIERS.forEach(t => {
+    t.agents.forEach(a => { agents[a] = { model: state[t.key] }; });
+  });
+  return JSON.stringify({
+    "$schema": "https://opencode.ai/config.json",
+    "comment": "Generated by configurator. Copy to .opencode/opencode.json",
+    "model": state.architect,
+    "agent": agents
+  }, null, 2);
+}
+
+function showJson() {
+  document.getElementById("output").textContent = outputJson();
+  document.getElementById("output").classList.add("show");
+}
+
+render();
+</script>
+</body>
+</html>
