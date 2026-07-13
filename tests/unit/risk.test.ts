@@ -222,14 +222,14 @@ describe('RAG Retrieval', () => {
           date: '2026-07-01',
           title: 'Cảnh báo lừa đảo giả mạo công an',
           summary: 'Nhiều vụ giả mạo công an yêu cầu chuyển tiền.',
-          signals: ['authority_impersonation', 'upfront_payment'],
+          signals: ['authority_impersonation' as any, 'upfront_payment' as any],
         },
       ],
       search: (signals: any[]) =>
         index.alerts.filter((a) => signals.some((s) => a.signals.includes(s))),
     };
 
-    const result = retrieveRag({ signals: ['authority_impersonation'] }, index);
+    const result = retrieveRag({ signals: ['authority_impersonation' as any] }, index);
     expect(result.alerts).toHaveLength(1);
     expect(result.alerts[0].title).toContain('giả mạo công an');
   });
@@ -237,13 +237,13 @@ describe('RAG Retrieval', () => {
   it('limits results', () => {
     const index = {
       alerts: [
-        { id: '1', source: 'x', sourceUrl: 'x', date: 'x', title: 'x', summary: 'x', signals: ['urgency'] },
-        { id: '2', source: 'x', sourceUrl: 'x', date: 'x', title: 'x', summary: 'x', signals: ['urgency'] },
-        { id: '3', source: 'x', sourceUrl: 'x', date: 'x', title: 'x', summary: 'x', signals: ['urgency'] },
+        { id: '1', source: 'x', sourceUrl: 'x', date: 'x', title: 'x', summary: 'x', signals: ['urgency' as any] },
+        { id: '2', source: 'x', sourceUrl: 'x', date: 'x', title: 'x', summary: 'x', signals: ['urgency' as any] },
+        { id: '3', source: 'x', sourceUrl: 'x', date: 'x', title: 'x', summary: 'x', signals: ['urgency' as any] },
       ],
       search: () => index.alerts,
     };
-    const result = retrieveRag({ signals: ['urgency'], limit: 2 }, index);
+    const result = retrieveRag({ signals: ['urgency' as any], limit: 2 }, index);
     expect(result.alerts).toHaveLength(2);
   });
 
@@ -256,7 +256,7 @@ describe('RAG Retrieval', () => {
         date: '2026-07-01',
         title: 'Cảnh báo lừa đảo',
         summary: 'Nhiều vụ giả mạo công an.',
-        signals: ['authority_impersonation'],
+        signals: ['authority_impersonation' as any],
       },
     ];
     const context = buildRagContext(alerts);
