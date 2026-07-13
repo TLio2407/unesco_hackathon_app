@@ -92,8 +92,8 @@ async function loadLlmClient(): Promise<LlmClient> {
       return new CloudflareLlmClient();
     }
     // In Node.js, use OpenAI SDK
-    const { OpenAI } = await import('openai');
-    return new OpenaiLlmClient(new OpenAI());
+    // openai not a dependency in this project; use mock only
+    return new MockLlmClient();
   } catch {
     return new MockLlmClient();
   }
