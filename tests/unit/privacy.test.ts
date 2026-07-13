@@ -158,7 +158,7 @@ describe('AuditLogger', () => {
     al.log({ timestamp: 2, sessionId: 's2', action: 'b' });
     const lines = al.export('jsonl').split('\n').filter(Boolean);
     expect(lines).toHaveLength(2);
-    expect(() => lines.map(JSON.parse)).not.toThrow();
+    expect(() => lines.map((s: string) => JSON.parse(s) as any)).not.toThrow();
   });
 
   it('export json produces array', () => {
