@@ -1,67 +1,214 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default function AICompanionScreen() {
-  const [inputText, setInputText] = useState('');
+import { LessonCard } from '@/components/lesson-card';
+import { RedFlagList } from '@/components/red-flag-list';
+import { RiskBadge } from '@/components/risk-badge';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { createAnalyzeClient } from '@/api/client';
+import type { AnalyzeOutput, AnalysisInput } from '@/api/contract';
+import { redact } from '@/lib/redact';
+import { t } from '@/i18n';
+import { Accessibility } from '@/theme/tokens';
+import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+
+const client = createAnalyzeClient();
+type Mode = 'text' | 'url';
+
+export default function CompanionScreen() {
+  const [mode, setMode] = useState<Mode>('text');
+  const [value, setValue] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<AnalyzeOutput | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function onSubmit() {
+    const raw = value.trim();
+    if (!raw || loading) return;
+    setLoading(true);
+    setError(null);
+    const input: AnalysisInput =
+      mode === 'url' ? { kind: 'url', url: raw } : { kind: 'text', text: redact(raw).text };
+    try {
+      setResult(await client.analyze(input));
+    } catch {
+      setError(t('common.error'));
+      setResult(null);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.title}>Bạn đang nghi ngờ điều gì?</Text>
-        <Text style={styles.subtitle}>Gửi tin nhắn, hình ảnh hoặc link để AI kiểm tra giúp bạn nhé.</Text>
+    <ThemedView style={styles.container}>
+      <SafeAreaView style={styles.safe}>
+        <ScrollView
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+          style={styles.scroll}>
+          <ThemedText type="subtitle" style={styles.title}>
+            {t('companion.title')}
+          </ThemedText>
 
-        <View style={styles.inputContainer}>
+          <View style={styles.modeRow}>
+            <ModeButton active={mode === 'text'} label={t('companion.sourceText')} onPress={() => setMode('text')} />
+            <ModeButton active={mode === 'url'} label={t('companion.sourceUrl')} onPress={() => setMode('url')} />
+          </View>
+
           <TextInput
             style={styles.input}
-            placeholder="Dán link hoặc nhập nội dung..."
-            value={inputText}
-            onChangeText={setInputText}
+            value={value}
+            onChangeText={setValue}
+            placeholder={t('companion.inputPlaceholder')}
+            placeholderTextColor="#9A9A9A"
             multiline
+            textAlignVertical="top"
+            autoCapitalize="none"
+            keyboardType={mode === 'url' ? 'url' : 'default'}
           />
-          {/* Voice Input Button - FR04 */}
-          <TouchableOpacity style={styles.voiceButton}>
-            <Ionicons name="mic" size={28} color="#FFF" />
-          </TouchableOpacity>
-        </View>
 
-        {/* Action Buttons */}
-        <View style={styles.actionRow}>
-          <TouchableOpacity style={styles.analyzeButton}>
-            <Text style={styles.buttonText}>Phân tích ngay</Text>
-          </TouchableOpacity>
-        </View>
+          <Pressable
+            style={({ pressed }) => [styles.submit, pressed && styles.submitPressed]}
+            onPress={onSubmit}
+            disabled={loading || !value.trim()}>
+            <ThemedText style={styles.submitText}>
+              {loading ? t('common.loading') : t('companion.submit')}
+            </ThemedText>
+          </Pressable>
 
-        {/* Placeholder for AI Result (FR11, FR12, FR13) */}
-        <View style={styles.resultCard}>
-           <Text style={styles.resultTitle}>⚠️ Kết quả phân tích:</Text>
-           <Text style={styles.resultText}>Đây có thể là tin nhắn giả mạo ngân hàng. Không được bấm vào đường link!</Text>
-           
-           {/* Share to Trusted Circle Button - FR13 */}
-           <TouchableOpacity style={styles.shareButton}>
-             <Ionicons name="share-social" size={20} color="#FFF" />
-             <Text style={styles.shareText}>Chia sẻ cho người thân</Text>
-           </TouchableOpacity>
+          {loading && <ActivityIndicator style={styles.loader} size="large" color={Accessibility.colors.primaryAction} />}
+          {error && (
+            <ThemedText style={[styles.body, { color: Accessibility.colors.riskHigh }]}>{error}</ThemedText>
+          )}
+
+          {result && <ResultCard result={result} />}
+        </ScrollView>
+      </SafeAreaView>
+    </ThemedView>
+  );
+}
+
+function ModeButton({ active, label, onPress }: { active: boolean; label: string; onPress: () => void }) {
+  return (
+    <Pressable
+      style={({ pressed }) => [
+        styles.modeBtn,
+        active && styles.modeBtnActive,
+        pressed && styles.modeBtnPressed,
+      ]}
+      onPress={onPress}>
+      <ThemedText style={[styles.modeLabel, active && { color: Accessibility.colors.primaryActionText }]}>
+        {label}
+      </ThemedText>
+    </Pressable>
+  );
+}
+
+function ResultCard({ result }: { result: AnalyzeOutput }) {
+  return (
+    <View style={styles.result}>
+      <RiskBadge level={result.riskLevel} />
+      <RedFlagList flags={result.redFlags} />
+
+      {result.verificationSteps.length > 0 && (
+        <Section titleKey="companion.result.verificationSteps" items={result.verificationSteps} />
+      )}
+
+      {result.nextAction && (
+        <View style={styles.block}>
+          <ThemedText type="subtitle" style={styles.blockTitle}>
+            {t('companion.result.nextAction')}
+          </ThemedText>
+          <ThemedText style={styles.body}>{result.nextAction}</ThemedText>
         </View>
-      </ScrollView>
+      )}
+
+      {result.lessonCard && <LessonCard card={result.lessonCard} />}
+
+      {result.disclaimer && (
+        <ThemedText style={styles.disclaimer}>{result.disclaimer}</ThemedText>
+      )}
+    </View>
+  );
+}
+
+function Section({ titleKey, items }: { titleKey: string; items: string[] }) {
+  return (
+    <View style={styles.block}>
+      <ThemedText type="subtitle" style={styles.blockTitle}>
+        {t(titleKey)}
+      </ThemedText>
+      {items.map((s, i) => (
+        <View key={i} style={styles.item}>
+          <ThemedText style={styles.bullet}>•</ThemedText>
+          <ThemedText style={styles.body}>{s}</ThemedText>
+        </View>
+      ))}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F5F7FA' },
-  scroll: { padding: 20 },
-  title: { fontSize: 24, fontWeight: 'bold', color: '#333', marginBottom: 10 },
-  subtitle: { fontSize: 16, color: '#666', marginBottom: 20 },
-  inputContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
-  input: { flex: 1, backgroundColor: '#FFF', borderRadius: 12, padding: 15, fontSize: 18, minHeight: 60, borderColor: '#DDD', borderWidth: 1 },
-  voiceButton: { backgroundColor: '#FF3B30', padding: 15, borderRadius: 12, marginLeft: 10 },
-  actionRow: { flexDirection: 'row', justifyContent: 'center' },
-  analyzeButton: { backgroundColor: '#007AFF', paddingVertical: 15, paddingHorizontal: 30, borderRadius: 25, width: '100%', alignItems: 'center' },
-  buttonText: { color: '#FFF', fontSize: 18, fontWeight: 'bold' },
-  resultCard: { marginTop: 30, backgroundColor: '#FFF', padding: 20, borderRadius: 15, borderColor: '#FFE0E0', borderWidth: 2 },
-  resultTitle: { fontSize: 20, fontWeight: 'bold', color: '#D32F2F', marginBottom: 10 },
-  resultText: { fontSize: 18, lineHeight: 28, color: '#333', marginBottom: 20 },
-  shareButton: { backgroundColor: '#34C759', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 12, borderRadius: 10 },
-  shareText: { color: '#FFF', fontSize: 16, fontWeight: 'bold', marginLeft: 10 }
+  container: { flex: 1 },
+  safe: { flex: 1 },
+  scroll: { flex: 1 },
+  content: {
+    paddingHorizontal: Spacing.four,
+    paddingVertical: Spacing.four,
+    gap: Spacing.three,
+    maxWidth: MaxContentWidth,
+    alignSelf: 'center',
+    width: '100%',
+    paddingBottom: BottomTabInset + Spacing.five,
+  },
+  title: { fontSize: Accessibility.fontSize.title },
+  modeRow: { flexDirection: 'row', gap: Spacing.two },
+  modeBtn: {
+    flex: 1,
+    minHeight: Accessibility.minTouchSize,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: Spacing.four,
+    borderWidth: 2,
+    borderColor: Accessibility.colors.primaryAction,
+    backgroundColor: Accessibility.colors.surfaceCard,
+  },
+  modeBtnActive: { backgroundColor: Accessibility.colors.primaryAction },
+  modeBtnPressed: { opacity: 0.8 },
+  modeLabel: { fontSize: Accessibility.fontSize.normal, fontWeight: '600' },
+  input: {
+    minHeight: 120,
+    borderRadius: Spacing.four,
+    borderWidth: 2,
+    borderColor: Accessibility.colors.calmTextSecondary,
+    padding: Spacing.three,
+    fontSize: Accessibility.fontSize.normal,
+    color: Accessibility.colors.calmText,
+    backgroundColor: Accessibility.colors.surfaceCard,
+    textAlignVertical: 'top',
+  },
+  submit: {
+    minHeight: Accessibility.minTouchSize,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: Spacing.four,
+    backgroundColor: Accessibility.colors.primaryAction,
+  },
+  submitPressed: { opacity: 0.85 },
+  submitText: { color: Accessibility.colors.primaryActionText, fontSize: Accessibility.fontSize.large, fontWeight: '700' },
+  loader: { alignSelf: 'center', marginVertical: Spacing.three },
+  result: { gap: Spacing.four, alignSelf: 'stretch', marginTop: Spacing.two },
+  block: { gap: Spacing.two, alignSelf: 'stretch' },
+  blockTitle: { fontSize: Accessibility.fontSize.large },
+  item: { flexDirection: 'row', gap: Spacing.two, alignItems: 'flex-start' },
+  bullet: { fontSize: Accessibility.fontSize.normal, lineHeight: 28 },
+  body: { flex: 1, fontSize: Accessibility.fontSize.normal, lineHeight: 28 },
+  disclaimer: {
+    fontSize: Accessibility.fontSize.small,
+    fontStyle: 'italic',
+    color: Accessibility.colors.calmTextSecondary,
+    lineHeight: 24,
+  },
 });

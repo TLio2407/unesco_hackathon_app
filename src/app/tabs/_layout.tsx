@@ -24,7 +24,7 @@ export default function TabLayout() {
         }} 
       />
       <Tabs.Screen 
-        name="circle" 
+        name="trusted_circle" 
         options={{ 
           title: 'Người thân', 
           tabBarIcon: ({ color }) => <Ionicons name="people" size={28} color={color} /> 
