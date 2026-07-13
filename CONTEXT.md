@@ -131,9 +131,28 @@ AI_MODEL=gemma-4-26b-a4b-it
 | WP PRs failing CI after agent build | All agents must run `pnpm typecheck && pnpm test` before push |
 | `toHaveLengthGreaterThan` doesn't exist | Use `.length).toBeGreaterThan(0)` in vitest |
 
+## Session Audit (2026-07-14)
+
+| Config | Count | State |
+|--------|-------|-------|
+| Global markdown agents | 19 | ✅ `~/.config/opencode/agents/company*.md` + `swarm*.md` |
+| JSONC agents with `{file:}` refs | 12 | ✅ Fixed — replaced truncated inline prompts with file references |
+| Global skills | 226 | ✅ 220 upstream + 6 from this project |
+| Project skills | 6 | ✅ in `.agent/skills/` |
+| Project `.opencode/opencode.json` | 8 agents | ✅ valid JSON, no comment key |
+| Betriebsrat | 7 artifacts | ✅ clearance + policies + SOPs + veto dir + whistleblower |
+| Sessions | 2 | `S-20260713-180000`, `S-20260713-230000` |
+
+### Critical Config Fix Applied
+JSONC (`~/.config/opencode/opencode.jsonc`) had 25 agents with **inline prompts truncated at 2000 chars** and zero `{file:}` references. This meant markdown agent files were ignored. Fixed: all 12 `company-*` agents now use `"prompt": "{file:~/.config/opencode/agents/<name>.md}"` — markdown is the source of truth.
+
+### Auto-Feedback Loop
+`scripts/feedback-global-agents.sh` runs after each Company Architect mission — extracts patterns from `.opencode-state/` and injects them into global agent prompts.
+
 ## Skills Index
 - Want to add a new backend module? → `backend-parallel-branch/SKILL.md`
 - Writing Vietnamese regex? → `vn-text-matching/SKILL.md`
 - CI failing with lockfile? → `ci-lockfile-sync/SKILL.md`
 - Delegating to subagents? → `company-arch-workflow/SKILL.md`
 - Handling user PII? → `privacy-by-design/SKILL.md`
+- Parallel git branch workflow? → `parallel-branch-workflow/SKILL.md`
