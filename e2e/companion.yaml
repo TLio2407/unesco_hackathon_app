@@ -1,0 +1,20 @@
+# Maestro E2E flow for the Companion "decision assistant" screen.
+# NOTE: This is a checked-in artifact only. It is NOT executed in CI here;
+# a Maestro CLI job can be added later to run it on a simulator/emulator.
+# The crafted message triggers two high-weight red-flag signals
+# (upfront_payment + urgency) in the local mock backend, so the result is
+# deterministically "Rủi ro cao" (high risk).
+appId: com.anonymous.unesco_hackathon_app
+name: Companion Analyze Flow
+tags:
+  - e2e
+  - companion
+---
+- launchApp
+- tapOn:
+    text: "Paste văn bản, link hoặc chụp màn hình..."
+- inputText: "Đầu tư lợi nhuận 30%/tháng, chuyển tiền ngay lập tức để nhận ưu đãi"
+- tapOn:
+    text: "Phân tích"
+- assertVisible:
+    text: "Rủi ro cao"

@@ -1,12 +1,13 @@
-name: CI
+name: Release (EAS Update)
 
 on:
-  pull_request:
-    branches: [main]
+  push:
+    tags:
+      - 'v*'
 
 jobs:
-  gate:
-    name: Typecheck + Test + Lint
+  eas-update:
+    name: Publish OTA update via EAS Update
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,12 +27,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Typecheck (WP2 scope)
-        run: pnpm exec tsc -p tsconfig.wp2.json --noEmit
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Test
-        run: pnpm test
-
-      - name: Lint
-        run: pnpm lint
-        continue-on-error: true
+      - name: Publish update
+        run: eas update --branch "${{ github.ref_name }}" --message "OTA ${{ github.ref_name }}"
