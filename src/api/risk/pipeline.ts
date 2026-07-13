@@ -15,6 +15,8 @@ import type {
   RagResult,
 } from './contract';
 
+export type { RiskPipelineInput, RiskPipelineOutput };
+
 import { evaluateRules } from './rules';
 import { scoreRisk } from './scorer';
 import { generateExplanation } from './llm';

@@ -9,6 +9,8 @@
 
 import type { RedFlagSignal, TrustedAlert, RagRetrieval, RagResult } from './contract';
 
+export type { RagRetrieval, RagResult };
+
 // ── RAG index interface (from WP4) ───────────────────────────────────────────
 
 export interface AlertsIndex {

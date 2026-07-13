@@ -204,7 +204,7 @@ describe('LLM Explainer', () => {
     ];
     const result = await generateExplanation(signals, 'test');
     expect(result.explanation).toBeTruthy();
-    delete global.fetch;
+    delete (global as any).fetch;
   });
 });
 
@@ -237,9 +237,9 @@ describe('RAG Retrieval', () => {
   it('limits results', () => {
     const index = {
       alerts: [
-        { id: '1', source: 'x', date: 'x', title: 'x', summary: 'x', signals: ['urgency'] },
-        { id: '2', source: 'x', date: 'x', title: 'x', summary: 'x', signals: ['urgency'] },
-        { id: '3', source: 'x', date: 'x', title: 'x', summary: 'x', signals: ['urgency'] },
+        { id: '1', source: 'x', sourceUrl: 'x', date: 'x', title: 'x', summary: 'x', signals: ['urgency'] },
+        { id: '2', source: 'x', sourceUrl: 'x', date: 'x', title: 'x', summary: 'x', signals: ['urgency'] },
+        { id: '3', source: 'x', sourceUrl: 'x', date: 'x', title: 'x', summary: 'x', signals: ['urgency'] },
       ],
       search: () => index.alerts,
     };

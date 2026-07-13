@@ -14,7 +14,7 @@ import type { RedFlagSignal, MatchedSignal } from './contract';
 
 // ── Rule definition ────────────────────────────────────────────────────────
 
-interface Rule {
+export interface Rule {
   signal: RedFlagSignal;
   weight: 'high' | 'medium';
   keywords: RegExp[];

@@ -61,7 +61,7 @@ export interface LlmClient {
 }
 
 // Mock client for testing
-class MockLlmClient implements LlmClient {
+export class MockLlmClient implements LlmClient {
   async generate(prompt: LlmPrompt): Promise<LlmResponse> {
     // Extract signals from prompt (simple regex)
     const signals: MatchedSignal[] = [];
@@ -79,8 +79,9 @@ class MockLlmClient implements LlmClient {
   }
 }
 
-// Import dynamically to avoid Node.js native deps
-let LlmClientImpl: typeof LlmClient | undefined;
+// ── LLM client registry ──────────────────────────────────────────────────────
+
+let _llmClient: LlmClient | undefined;
 
 async function loadLlmClient(): Promise<LlmClient> {
   try {
