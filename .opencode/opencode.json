@@ -1,6 +1,5 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "comment": "SilverTrust MIL Companion — Company Architect project config. Run scripts/configure-agent-models.sh to set per-tier models interactively before each session.",
   "agent": {
     "company": {
       "mode": "primary",
