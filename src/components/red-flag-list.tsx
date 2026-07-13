@@ -1,0 +1,32 @@
+import { StyleSheet, View } from 'react-native';
+
+import { ThemedText } from './themed-text';
+import { t } from '@/i18n';
+import type { RedFlag } from '@/api/contract';
+import { Accessibility } from '@/theme/tokens';
+import { Spacing } from '@/constants/theme';
+
+export function RedFlagList({ flags }: { flags: RedFlag[] }) {
+  if (!flags.length) return null;
+  return (
+    <View style={styles.container}>
+      <ThemedText type="subtitle" style={styles.heading}>
+        {t('companion.result.redFlags')}
+      </ThemedText>
+      {flags.map((f, i) => (
+        <View key={`${f.signal}-${i}`} style={styles.item}>
+          <ThemedText style={styles.bullet}>•</ThemedText>
+          <ThemedText style={styles.explanation}>{f.explanation}</ThemedText>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { gap: Spacing.two, alignSelf: 'stretch' },
+  heading: { fontSize: Accessibility.fontSize.large, color: Accessibility.colors.riskHigh },
+  item: { flexDirection: 'row', gap: Spacing.two, alignItems: 'flex-start' },
+  bullet: { fontSize: Accessibility.fontSize.normal, color: Accessibility.colors.riskHigh, lineHeight: 28 },
+  explanation: { flex: 1, fontSize: Accessibility.fontSize.normal, lineHeight: 28 },
+});

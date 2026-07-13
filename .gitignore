@@ -41,3 +41,17 @@ example
 # generated native folders
 /ios
 /android
+
+# Company Architecture local orchestration state (session/brief/works-council) — not app source
+.opencode-state/
+
+# env / secrets
+.env
+.env.*
+
+# tests & coverage
+coverage/
+.maestro/
+
+# EAS local cache (keep eas.json tracked)
+.eas/

@@ -1,0 +1,51 @@
+{
+  "common": {
+    "appName": "An Tâm Số",
+    "tagline": "Đồng hành tin cậy cùng cô/chú trên không gian số",
+    "cancel": "Huỷ",
+    "confirm": "Xác nhận",
+    "close": "Đóng",
+    "loading": "Đang xử lý...",
+    "error": "Có lỗi xảy ra",
+    "retry": "Thử lại"
+  },
+  "companion": {
+    "title": "Trợ lý Quyết định",
+    "inputPlaceholder": "Paste văn bản, link hoặc chụp màn hình...",
+    "submit": "Phân tích",
+    "sourceText": "Nhập văn bản",
+    "sourceUrl": "Nhập đường link",
+    "sourceImage": "Chọn ảnh màn hình",
+    "result": {
+      "safe": "An toàn",
+      "caution": "Cần cẩn trọng",
+      "highRisk": "Rủi ro cao",
+      "insufficientData": "Chưa đủ dữ liệu",
+      "verificationSteps": "Các bước kiểm chứng",
+      "nextAction": "Bước tiếp theo",
+      "redFlags": "Dấu hiệu đáng ngờ",
+      "lesson": "Bài học nhỏ",
+      "disclaimer": "AI chỉ hỗ trợ nhận diện dấu hiệu, không thay cô/chú quyết định và không đưa lời khuyên y tế/pháp lý/tài chính."
+    },
+    "trustedCircle": "Hỏi người thân",
+    "trustedCircleDesc": "Gửi tóm tắt tình huống cho người thân tin cậy"
+  },
+  "alert": {
+    "title": "Cảnh báo mới",
+    "placeholder": "Tính năng cảnh báo lừa đảo sẽ được cập nhật trong thời gian tới."
+  },
+  "community": {
+    "title": "Cộng đồng",
+    "placeholder": "Mục kết nối sự kiện và lớp học MIL cộng đồng."
+  },
+  "learning": {
+    "title": "Bài học",
+    "placeholder": "Bài học MIL nhỏ sẽ hiển thị tại đây sau mỗi lần phân tích."
+  },
+  "circle": {
+    "title": "Người thân",
+    "placeholder": "Chia sẻ tóm tắt tình huống với người thân (đã ẩn thông tin nhạy cảm).",
+    "shareButton": "Gửi qua Zalo/Telegram",
+    "redactedNotice": "Thông tin nhạy cảm đã được ẩn"
+  }
+}
