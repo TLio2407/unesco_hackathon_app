@@ -28,8 +28,10 @@
     "react-native-worklets": "0.10.0"
   },
   "devDependencies": {
+    "@types/node": "^26.1.1",
     "@types/react": "~19.2.2",
-    "typescript": "~6.0.3"
+    "typescript": "~6.0.3",
+    "vitest": "^4.1.10"
   },
   "scripts": {
     "start": "expo start",
@@ -37,7 +39,9 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.wp2.json --noEmit"
   },
   "private": true
 }
