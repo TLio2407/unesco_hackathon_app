@@ -5,7 +5,6 @@ export type AnalysisInput =
   | { kind: 'url'; url: string }
   | { kind: 'image'; ref: string }
   | { kind: 'voice'; data: string; mimeType: string; durationMs?: number };
-  | { kind: 'voice'; data: string; mimeType: string; durationMs?: number };
 
 export type RedFlagSignal =
   | 'urgency'
