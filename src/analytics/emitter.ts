@@ -1,4 +1,5 @@
 import type { AnalyticsEvent } from './schema';
+import { filterMeta } from './schema';
 
 const DEFAULT_INTERVAL = 30_000;
 const DEFAULT_BATCH_SIZE = 100;
@@ -31,7 +32,9 @@ export class AnalyticsEmitter {
   }
 
   track(event: AnalyticsEvent): void {
-    this.queue.push(event);
+    // Betriebsrat A-002: filter PII at ingestion time, not just export
+    const safe = { ...event, metadata: filterMeta(event.metadata) };
+    this.queue.push(safe);
     if (this.queue.length >= this.batchSize) {
       this.flush().catch(() => {});
     }

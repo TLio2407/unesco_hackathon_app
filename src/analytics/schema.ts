@@ -12,3 +12,28 @@ export interface AnalyticsEvent {
   timestamp: number;
   metadata?: Record<string, string | number | boolean>;
 }
+
+/** Whitelist: only these metadata keys may enter the analytics pipeline. */
+export const VALID_META_KEYS = new Set([
+  'riskLevel',
+  'redFlagCount',
+  'lessonShown',
+  'signal',
+  'count',
+]);
+
+/** Strip non-whitelisted metadata keys at ingestion time. */
+export function filterMeta(
+  meta: Record<string, any> | undefined
+): Record<string, string | number | boolean> | undefined {
+  if (!meta) return undefined;
+  const filtered: Record<string, string | number | boolean> = {};
+  let kept = false;
+  for (const key of Object.keys(meta)) {
+    if (VALID_META_KEYS.has(key)) {
+      filtered[key] = meta[key];
+      kept = true;
+    }
+  }
+  return kept ? filtered : undefined;
+}
