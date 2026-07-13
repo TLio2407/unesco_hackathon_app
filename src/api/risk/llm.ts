@@ -8,6 +8,7 @@
  */
 
 import type { MatchedSignal, LlmPrompt, LlmResponse } from './contract';
+export type { LlmPrompt, LlmResponse };
 
 // ── Prompt templates ─────────────────────────────────────────────────────────
 
