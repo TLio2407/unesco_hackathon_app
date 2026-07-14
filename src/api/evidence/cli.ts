@@ -1,13 +1,13 @@
-import type { AlertSchema } from './schema';
 import { VALID_SOURCES, VALID_SIGNALS, VALID_CATEGORIES } from './schema';
 
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
-export function validateAlerts(alerts: AlertSchema[]): string[] {
+export function validateAlerts(alerts: unknown[]): string[] {
   const errors: string[] = [];
   const seen = new Set<string>();
 
-  for (const a of alerts) {
+  for (const item of alerts) {
+    const a = item as Record<string, any>;
     if (!a.id) errors.push(`Alert missing id`);
     if (seen.has(a.id)) errors.push(`Duplicate id: ${a.id}`);
     seen.add(a.id);
