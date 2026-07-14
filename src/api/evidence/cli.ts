@@ -1,53 +1,57 @@
-import type { AlertSchema } from './schema';
 import { VALID_SOURCES, VALID_SIGNALS, VALID_CATEGORIES } from './schema';
 
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
-export function validateAlerts(alerts: AlertSchema[]): string[] {
+export function validateAlerts(alerts: unknown[]): string[] {
   const errors: string[] = [];
   const seen = new Set<string>();
 
-  for (const a of alerts) {
+  for (const item of alerts) {
+    const a = item as Record<string, unknown>;
+    const id = String(a.id ?? '');
+
     if (!a.id) errors.push(`Alert missing id`);
-    if (seen.has(a.id)) errors.push(`Duplicate id: ${a.id}`);
-    seen.add(a.id);
+    if (seen.has(id)) errors.push(`Duplicate id: ${id}`);
+    seen.add(id);
 
     if (!VALID_SOURCES.includes(a.source as any)) {
-      errors.push(`"${a.id}": invalid source "${a.source}"`);
+      errors.push(`"${id}": invalid source "${String(a.source)}"`);
     }
 
-    if (!ISO_DATE_RE.test(a.date)) {
-      errors.push(`"${a.id}": invalid ISO date "${a.date}"`);
+    if (!ISO_DATE_RE.test(String(a.date ?? ''))) {
+      errors.push(`"${id}": invalid ISO date "${String(a.date)}"`);
     }
 
-    if (!a.title || a.title.trim().length === 0) {
-      errors.push(`"${a.id}": empty title`);
+    if (!a.title || String(a.title).trim().length === 0) {
+      errors.push(`"${id}": empty title`);
     }
 
-    if (!a.summary || a.summary.trim().length === 0) {
-      errors.push(`"${a.id}": empty summary`);
+    if (!a.summary || String(a.summary).trim().length === 0) {
+      errors.push(`"${id}": empty summary`);
     }
 
     if (!VALID_CATEGORIES.includes(a.category as any)) {
-      errors.push(`"${a.id}": invalid category "${a.category}"`);
+      errors.push(`"${id}": invalid category "${String(a.category)}"`);
     }
 
-    if (!a.signals || a.signals.length === 0) {
-      errors.push(`"${a.id}": no signals`);
+    const signals = a.signals as unknown[] | undefined;
+    if (!signals || signals.length === 0) {
+      errors.push(`"${id}": no signals`);
     } else {
-      for (const s of a.signals) {
+      for (const s of signals) {
         if (!VALID_SIGNALS.includes(s as any)) {
-          errors.push(`"${a.id}": invalid signal "${s}"`);
+          errors.push(`"${id}": invalid signal "${String(s)}"`);
         }
       }
     }
 
-    if (!a.sourceUrl || a.sourceUrl.trim().length === 0) {
-      errors.push(`"${a.id}": empty sourceUrl`);
+    const sourceUrl = String(a.sourceUrl ?? '');
+    if (!sourceUrl.trim()) {
+      errors.push(`"${id}": empty sourceUrl`);
     }
 
     if (a.region !== 'VN' && a.region !== 'global') {
-      errors.push(`"${a.id}": invalid region "${a.region}"`);
+      errors.push(`"${id}": invalid region "${String(a.region)}"`);
     }
   }
 
