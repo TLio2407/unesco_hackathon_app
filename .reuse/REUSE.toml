@@ -1,0 +1,39 @@
+version = 3.0
+SPDX-PackageName = unesco_hackathon_app
+SPDX-PackageSupplier = SilverTrust Contributors
+SPDX-PackageDownloadLocation = https://github.com/TLio2407/unesco_hackathon_app
+
+[[file]]
+path = "docs/**"
+SPDX-License-Identifier = MIT
+SPDX-FileCopyrightText = 2026 SilverTrust contributors
+
+[[file]]
+path = "src/**"
+SPDX-License-Identifier = MIT
+SPDX-FileCopyrightText = 2026 SilverTrust contributors
+
+[[file]]
+path = "scripts/**"
+SPDX-License-Identifier = MIT
+SPDX-FileCopyrightText = 2026 SilverTrust contributors
+
+[[file]]
+path = "**/*.json"
+SPDX-License-Identifier = MIT
+SPDX-FileCopyrightText = 2026 SilverTrust contributors
+
+[[file]]
+path = "LICENSE"
+SPDX-License-Identifier = MIT
+SPDX-FileCopyrightText = 2026 SilverTrust contributors
+
+[[file]]
+path = ".reuse/dep5"
+SPDX-License-Identifier = CC0-1.0
+SPDX-FileCopyrightText = 2026 SilverTrust contributors
+
+[[file]]
+path = ".reuse/REUSE.toml"
+SPDX-License-Identifier = MIT
+SPDX-FileCopyrightText = 2026 SilverTrust contributors
