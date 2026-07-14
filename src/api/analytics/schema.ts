@@ -37,7 +37,7 @@ export const AnalyticsEventSchema = z.object({
   kind: AnalyticsEventKindSchema,
   sessionId: z.string(),
   timestamp: z.number(),
-  metadata: z.record(z.union([z.string(), z.number(), z.boolean()])).optional(),
+  metadata: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional(),
 });
 export type AnalyticsEvent = z.infer<typeof AnalyticsEventSchema>;
 
