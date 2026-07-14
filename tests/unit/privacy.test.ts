@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { SessionManager } from '../../src/api/privacy/session';
 import { redactText, redactObject } from '../../src/api/privacy/guard';
 import { ConsentManager } from '../../src/api/privacy/consent';
@@ -117,7 +117,6 @@ describe('ConsentManager', () => {
     const cm = new ConsentManager();
     const { token } = cm.requireConsent('sess-1', 'share');
     // cheat expiry by fast-forwarding time
-    const origNow = Date.now;
     const fakeFuture = Date.now() + 61 * 60 * 1000;
     vi.spyOn(Date, 'now').mockReturnValue(fakeFuture);
     try {

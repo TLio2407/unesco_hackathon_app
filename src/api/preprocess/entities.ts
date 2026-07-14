@@ -146,7 +146,7 @@ export function extractMoney(text: string): VnMoney[] {
   }
   for (const m of text.matchAll(MONEY_PHRASE_RE)) {
     const raw = m[1];
-    const unit = (m[2] || '').toLowerCase();
+    const _unit = (m[2] || '').toLowerCase();
     const full = m[0];
     // Avoid dupes
     if (!results.some((r) => r.value === full)) {

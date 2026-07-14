@@ -5,7 +5,7 @@
  * Extends the existing contract.ts with WP3-specific types.
  */
 
-import type { AnalysisInput, AnalyzeOutput } from '@/api/contract';
+import type { AnalyzeOutput } from '@/api/contract';
 
 // ── Red flag signals (from mock.ts, now typed) ────────────────────────────────
 

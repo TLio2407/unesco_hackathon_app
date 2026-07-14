@@ -4,7 +4,7 @@
  * Tests the rule engine, scorer, LLM explainer, RAG, and pipeline.
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 import {
   evaluateRules,
@@ -12,7 +12,7 @@ import {
   listSignals,
 } from '../../src/api/risk/rules';
 
-import { scoreRisk, isRisky, DEFAULT_THRESHOLDS } from '../../src/api/risk/scorer';
+import { scoreRisk, isRisky } from '../../src/api/risk/scorer';
 
 import { generateExplanation } from '../../src/api/risk/llm';
 
