@@ -108,16 +108,6 @@ class CloudflareLlmClient implements LlmClient {
   }
 }
 
-// OpenAI SDK client
-class OpenaiLlmClient implements LlmClient {
-  constructor(private readonly openai: any) {}
-  async generate(prompt: LlmPrompt): Promise<LlmResponse> {
-    // In a real implementation, call OpenAI API
-    // For now, use mock
-    return new MockLlmClient().generate(prompt);
-  }
-}
-
 // ── Explanation generator ────────────────────────────────────────────────────
 
 /**
@@ -126,7 +116,7 @@ class OpenaiLlmClient implements LlmClient {
 export async function generateExplanation(
   signals: MatchedSignal[],
   text: string,
-  ragContext?: any[], // TrustedAlert[] from WP4
+  _ragContext?: any[], // TrustedAlert[] from WP4
 ): Promise<LlmResponse> {
   if (signals.length === 0) {
     return {
@@ -145,7 +135,7 @@ export async function generateExplanation(
   try {
     const client = await loadLlmClient();
     return await client.generate(prompt);
-  } catch (e) {
+  } catch {
     // Fallback to template
     return buildTemplateExplanation(signals);
   }

@@ -5,14 +5,10 @@
  * Transforms a PreprocessedInput into an AnalyzeOutput.
  */
 
-import type { PreprocessedInput } from '@/api/preprocess';
 import type {
   RiskPipelineInput,
   RiskPipelineOutput,
   MatchedSignal,
-  RiskEngineOutput,
-  LlmResponse,
-  RagResult,
 } from './contract';
 
 export type { RiskPipelineInput, RiskPipelineOutput };
@@ -20,7 +16,7 @@ export type { RiskPipelineInput, RiskPipelineOutput };
 import { evaluateRules } from './rules';
 import { scoreRisk } from './scorer';
 import { generateExplanation } from './llm';
-import { retrieveRag, buildRagContext } from './rag';
+import { retrieveRag } from './rag';
 
 // ── Pipeline ─────────────────────────────────────────────────────────────────
 
