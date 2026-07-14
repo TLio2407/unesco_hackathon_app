@@ -1,0 +1,4 @@
+format: https://spdx.github.io/depcat/reuse-format/
+Files: **
+SPDX-License-Identifier: MIT
+SPDX-FileCopyrightText: 2026 SilverTrust contributors
