@@ -55,7 +55,9 @@
     "analyzing": "Analyzing...",
     "resultTitle": "Analysis Result",
     "scanAgain": "Scan Again",
-    "tryAgain": "Try Again"
+    "tryAgain": "Try Again",
+    "submit": "Analyze",
+    "inputHint": "Enter URL or text to analyze"
   },
   "risk": {
     "safe": "Safe",

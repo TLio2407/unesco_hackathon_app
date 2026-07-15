@@ -40,6 +40,8 @@ export const Accessibility = {
   },
 } as const;
 
+export const Colors = Accessibility.colors;
+
 export const Spacing = {
   half: 2,
   one: 4,

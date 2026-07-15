@@ -55,7 +55,9 @@
     "analyzing": "Đang phân tích...",
     "resultTitle": "Kết quả phân tích",
     "scanAgain": "Quét lại",
-    "tryAgain": "Thử lại"
+    "tryAgain": "Thử lại",
+    "submit": "Phân tích",
+    "inputHint": "Nhập URL hoặc văn bản để phân tích"
   },
   "risk": {
     "safe": "An toàn",
