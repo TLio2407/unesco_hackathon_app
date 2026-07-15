@@ -1,17 +1,32 @@
-name: Release (EAS Update)
+name: Release
 
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        type: choice
+        description: Version bump type
+        options:
+          - patch
+          - minor
+          - major
+        default: patch
+      dry_run:
+        type: boolean
+        description: Dry run (no tag/push)
+        default: false
 
 jobs:
-  eas-update:
-    name: Publish OTA update via EAS Update
+  release:
+    name: Release
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -27,11 +42,72 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Setup EAS
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+      - name: Verify CI passes
+        run: |
+          pnpm typecheck
+          pnpm test
+          pnpm lint
 
-      - name: Publish update
-        run: eas update --branch "${{ github.ref_name }}" --message "OTA ${{ github.ref_name }}"
+      - name: Determine version bump
+        id: version
+        run: |
+          if [ "${{ github.event.inputs.version }}" = "patch" ]; then
+            echo "bump=patch" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.inputs.version }}" = "minor" ]; then
+            echo "bump=minor" >> $GITHUB_OUTPUT
+          else
+            echo "bump=major" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$PREV_TAG" ]; then
+            CHANGELOG=$(git log --oneline --pretty=format:"- %s" HEAD)
+          else
+            CHANGELOG=$(git log --oneline --pretty=format:"- %s" $PREV_TAG..HEAD)
+          fi
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "prev_tag=$PREV_TAG" >> $GITHUB_OUTPUT
+
+      - name: Bump version and create tag
+        if: github.event.inputs.dry_run == 'false'
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          npm version ${{ steps.version.outputs.bump }} -m "chore: release v%s"
+          git push origin main --tags
+
+      - name: Create GitHub Release
+        if: github.event.inputs.dry_run == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.bump }}
+          name: Release v${{ steps.version.outputs.bump }}
+          body: |
+            ## Changes
+            ${{ steps.changelog.outputs.changelog }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build EAS Update
+        if: github.event.inputs.dry_run == 'false'
+        run: |
+          echo "EXPO_TOKEN=${{ secrets.EXPO_TOKEN }}" >> $GITHUB_ENV
+          pnpm exec eas update --branch production --message "Release v${{ steps.version.outputs.bump }}"
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Dry run summary
+        if: github.event.inputs.dry_run == 'true'
+        run: |
+          echo "=== DRY RUN ==="
+          echo "Would bump: ${{ steps.version.outputs.bump }}"
+          echo "Previous tag: ${{ steps.changelog.outputs.prev_tag }}"
+          echo "Changelog:"
+          echo "${{ steps.changelog.outputs.changelog }}"
