@@ -1,6 +1,6 @@
 # SilverTrust MIL Companion — Project Map for Agents
 
-*Last updated: 2026-07-14. Maintained by Company Architect workflow.*
+*Last updated: 2026-07-15. Maintained by Company Architect workflow.*
 
 ## What This Is
 An AI companion for Vietnamese older adults (55+) to detect scams, misinformation, and AI-generated deceptive content. UNESCO Youth Hackathon 2026 entry.
@@ -14,7 +14,20 @@ An AI companion for Vietnamese older adults (55+) to detect scams, misinformatio
 | **Node** | 22+ |
 | **CI** | GitHub Actions (.github/workflows/ci.yml) |
 | **LLM** | gemma-4-26b-a4b-it via Google AI Studio (testing only, key in .env, NOT committed) |
-| **Tests** | 204+ across 13 test files |
+| **Tests** | 216+ across 14 test files |
+
+## Deployment (Production)
+| Service | URL | Status |
+|---------|-----|--------|
+| **Web App** | https://unesco.w9.nu | ✅ Live |
+| **API** | https://unesco-api.w9.nu | ✅ Live |
+| **QR Scanner** | https://unesco.w9.nu/scan | ✅ Working |
+
+**Infrastructure:**
+- VPS: sgp1.w9.nu (ARM64, IPv6 + NAT IPv4, SSH port 2201)
+- Cloudflare Tunnel: `45988ce5-cab0-47b2-bb85-4bcad78e8311`
+- Docker Compose: Web (port 8081) + API (port 3000)
+- Cloudflare DNS: CNAME → tunnel.cfargotunnel.com (Proxied)
 
 ## Repository Map
 
@@ -48,21 +61,22 @@ unesco_hackathon_app/
 │   ├── lib/                         ← Legacy libs (redact.ts, risk-meta.ts)
 │   ├── locales/                     ← Translation files (vi.json, en.json)
 │   └── theme/                       ← Design tokens
-├── tests/unit/                      ← 13 test files, 204+ tests
-├── data/evidence/alerts.json        ← 673-line curated scam alert database
-├── .agent/skills/                   ← Project skills (this directory)
-│   ├── backend-parallel-branch/SKILL.md      ← WP branching workflow
-│   ├── vn-text-matching/SKILL.md             ← Vietnamese regex patterns
-│   ├── ci-lockfile-sync/SKILL.md             ← CI lockfile prevention
-│   ├── company-arch-workflow/SKILL.md        ← German 3-layer delegation
-│   └── privacy-by-design/SKILL.md            ← PII redaction patterns
+├── tests/
+│   ├── unit/                        ← 13 test files, 204+ tests
+│   └── integration/                 ← Cross-WP pipeline tests
+├── data/evidence/alerts.json        ← 61 curated scam alert database
+├── .agent/skills/                   ← Project skills
+│   ├── deploy-docker-compose/       ← VPS Docker Compose deployment
+│   ├── backend-parallel-branch/     ← WP branching workflow
+│   ├── vn-text-matching/            ← Vietnamese regex patterns
+│   ├── ci-lockfile-sync/            ← CI lockfile prevention
+│   ├── company-arch-workflow/       ← German 3-layer delegation
+│   └── privacy-by-design/           ← PII redaction patterns
 ├── .opencode-state/                 ← Session state for Company Architect
-│   ├── sessions/S-20260713-230000/  ← Last mission session
-│   └── betriebsrat/                 ← Works Council vetoes, grievances, whistleblower
 ├── .github/workflows/
 │   ├── ci.yml                       ← PR validation: typecheck + test + lint
 │   └── release.yml                  ← EAS Update release pipeline
-└── An_Tam_So_UNESCO_Youth_Hackathon_Report.md  ← Full project brief (VN + EN)
+└── An_Tam_So_UNESCO_Youth_Hackathon_Report.md
 ```
 
 ## Architecture: Data Flow
@@ -76,7 +90,7 @@ WP2 Pre-process → PreprocessedInput { normalised, entities, redacted }
   ↓                  ↓
 WP4 Evidence → TrustedAlert[] → WP3 Risk Reasoning → AnalyzeOutput { riskLevel, redFlags, lessonCard }
   ↓                              ↓
-                              WP5 Output → Trusted Circle + Lesson Card
+                               WP5 Output → Trusted Circle + Lesson Card
   ↓                              ↓
 WP6 Privacy → Session + Consent + Audit
   ↓                              ↓
@@ -93,6 +107,7 @@ WP7 Analytics → Events → Export (JSONL/CSV)
 | D-04 | Two-tier PII protection (ingress + export) | Defense-in-depth: prevent leaks at both boundaries | 2026-07-13 |
 | D-05 | `company-*` subagents only, never `general` | German 3-layer governance ± BetrVG | 2026-07-13 |
 | D-06 | Git worktrees for parallel branches | Untracked file isolation, true concurrency | 2026-07-13 |
+| D-07 | Cloudflare Tunnel for NAT-only VPS | Free HTTPS + custom domain without public IPv4 | 2026-07-15 |
 
 ## Non-Negotiables (From Context Brief)
 - **German 3-layer corporate governance** (Aufsichtsrat → Vorstand → Betriebsrat)
@@ -107,16 +122,35 @@ WP7 Analytics → Events → Export (JSONL/CSV)
 
 ## Testing
 ```bash
-pnpm test            # All 204+ tests
+pnpm test            # All 216+ tests
 pnpm typecheck       # tsc -p tsconfig.wp2.json --noEmit
 pnpm lint            # expo lint (warnings allowed, continue-on-error in CI)
 pnpm vitest run tests/unit/<file>.test.ts  # Run specific test file
+pnpm vitest run tests/integration/  # Run integration tests
 ```
 
 ## Environment Variables (.env — NEVER COMMIT)
 ```
 AI_STUDIO_API_KEY=...   # Google AI Studio key for Gemma 4 26B
 AI_MODEL=gemma-4-26b-a4b-it
+```
+
+## Deployment Commands
+
+```bash
+# Deploy to VPS
+cd /opt/unesco-hackathon
+docker compose build --no-cache
+docker compose up -d
+
+# View logs
+docker compose logs -f
+
+# Restart
+docker compose restart
+
+# Cloudflare Tunnel (run as service)
+sudo systemctl enable --now cloudflared
 ```
 
 ## Common Pitfalls & Fixes
@@ -130,24 +164,8 @@ AI_MODEL=gemma-4-26b-a4b-it
 | TypeScript union `;` breaks type | `| { kind };` closes union — pipe goes BEFORE each variant |
 | WP PRs failing CI after agent build | All agents must run `pnpm typecheck && pnpm test` before push |
 | `toHaveLengthGreaterThan` doesn't exist | Use `.length).toBeGreaterThan(0)` in vitest |
-
-## Session Audit (2026-07-14)
-
-| Config | Count | State |
-|--------|-------|-------|
-| Global markdown agents | 19 | ✅ `~/.config/opencode/agents/company*.md` + `swarm*.md` |
-| JSONC agents with `{file:}` refs | 12 | ✅ Fixed — replaced truncated inline prompts with file references |
-| Global skills | 226 | ✅ 220 upstream + 6 from this project |
-| Project skills | 6 | ✅ in `.agent/skills/` |
-| Project `.opencode/opencode.json` | 8 agents | ✅ valid JSON, no comment key |
-| Betriebsrat | 7 artifacts | ✅ clearance + policies + SOPs + veto dir + whistleblower |
-| Sessions | 2 | `S-20260713-180000`, `S-20260713-230000` |
-
-### Critical Config Fix Applied
-JSONC (`~/.config/opencode/opencode.jsonc`) had 25 agents with **inline prompts truncated at 2000 chars** and zero `{file:}` references. This meant markdown agent files were ignored. Fixed: all 12 `company-*` agents now use `"prompt": "{file:~/.config/opencode/agents/<name>.md}"` — markdown is the source of truth.
-
-### Auto-Feedback Loop
-`scripts/feedback-global-agents.sh` runs after each Company Architect mission — extracts patterns from `.opencode-state/` and injects them into global agent prompts.
+| Cloudflare Tunnel 502 | Check `docker ps` - service must be healthy |
+| DNS not resolving | Add CNAME records in Cloudflare DNS (Proxied) |
 
 ## Skills Index
 - Want to add a new backend module? → `backend-parallel-branch/SKILL.md`
@@ -156,3 +174,15 @@ JSONC (`~/.config/opencode/opencode.jsonc`) had 25 agents with **inline prompts 
 - Delegating to subagents? → `company-arch-workflow/SKILL.md`
 - Handling user PII? → `privacy-by-design/SKILL.md`
 - Parallel git branch workflow? → `parallel-branch-workflow/SKILL.md`
+- Deploy to NAT-only VPS? → `deploy-docker-compose/SKILL.md`
+- Cloudflare Tunnel setup? → `deploy-cloudflare-tunnel/SKILL.md` (global)
+
+## Live Endpoints
+| Endpoint | URL |
+|----------|-----|
+| Web App | https://unesco.w9.nu |
+| QR Scanner | https://unesco.w9.nu/scan |
+| API Analyze | https://unesco-api.w9.nu/api/analyze |
+| API Health | https://unesco-api.w9.nu/health |
+| Tunnel ID | 45988ce5-cab0-47b2-bb85-4bcad78e8311 |
+
