@@ -8,6 +8,7 @@
  * - explanation: plain Vietnamese explanation for user
  *
  * Design: pure functions, no external deps, fully unit-testable.
+ * The text is normalized (diacritics folded to ASCII) before matching.
  */
 
 import type { RedFlagSignal, MatchedSignal } from './contract';
@@ -21,20 +22,30 @@ export interface Rule {
   explanation: string;
 }
 
-// ── Rules (ported from mock.ts, enhanced) ────────────────────────────────────
+// ── ASCII-fold helper (same as normalizer.foldDiacritics) ────────────────────
+
+function foldDiacritics(text: string): string {
+  return text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D');
+}
+
+// ── Rules (patterns for ASCII-folded text) ──────────────────────────────────
 
 const RULES: Rule[] = [
   {
     signal: 'urgency',
     weight: 'high',
     keywords: [
-      /10\s*phút/i,
-      /ngay\s*lập\s*tức/i,
-      /khẩn/i,
-      /hết\s*hạn/i,
-      /bí\s*mật/i,
-      /gấp/i,
-      /trong\s+vòng\s+\d+\s*(phút|giờ)/i,
+      /10\s*phut/i,
+      /ngay\s*lap\s*tuc/i,
+      /khan/i,
+      /het\s*han/i,
+      /bi\s*mat/i,
+      /gap/i,
+      /trong\s+vong\s+\d+\s*(phut|gio)/i,
     ],
     explanation: 'Tin nhắn đang ép cô/chú quyết định thật nhanh. Lừa đảo thường dùng áp lực thời gian.',
   },
@@ -42,13 +53,13 @@ const RULES: Rule[] = [
     signal: 'upfront_payment',
     weight: 'high',
     keywords: [
-      /chuyển\s*tiền/i,
-      /đặt\s*cọc/i,
-      /phí/i,
-      /trước\s*khi/i,
-      /nạp\s*tiền/i,
-      /thanh\s*toán\s*trước/i,
-      /đóng\s*phí\s*đăng\s*ký/i,
+      /chuyen\s*tien/i,
+      /dat\s*coc/i,
+      /phi/i,
+      /truoc\s*khi/i,
+      /nap\s*tien/i,
+      /thanh\s*toan\s*truoc/i,
+      /dong\s*phi\s*dang\s*ky/i,
     ],
     explanation: 'Yêu cầu chuyển tiền trước khi có xác minh là dấu hiệu rủi ro cao.',
   },
@@ -56,15 +67,15 @@ const RULES: Rule[] = [
     signal: 'authority_impersonation',
     weight: 'high',
     keywords: [
-      /công\s*an/i,
-      /ngân\s*hàng/i,
-      /bộ/i,
-      /cơ\s*quan/i,
-      /VNeID/i,
-      /tòa\s*án/i,
-      /chính\s*phủ/i,
-      /bảo\s*hiểm\s*xã\s*hội/i,
-      /cục\s*thuế/i,
+      /cong\s*an/i,
+      /ngan\s*hang/i,
+      /bo/i,
+      /co\s*quan/i,
+      /vneid/i,
+      /toa\s*an/i,
+      /chinh\s*phu/i,
+      /bao\s*hiem\s*xa\s*hoi/i,
+      /cuc\s*thue/i,
     ],
     explanation: 'Cơ quan chính thức thường không yêu cầu OTP/mật khẩu/chuyển tiền qua tin nhắn lạ.',
   },
@@ -74,11 +85,11 @@ const RULES: Rule[] = [
     keywords: [
       /bit\.ly/i,
       /tinyurl/i,
-      /bấm\s*link/i,
-      /đường\s*link\s*lạ/i,
-      /link\s*ở\s*trên/i,
+      /bam\s*link/i,
+      /duong\s*link\s*la/i,
+      /link\s*o\s*tren/i,
       /click\s*here/i,
-      /http:\/\/(?!www\.|[a-z]{2,}\.)/i, // http without domain
+      /http:\/\/(?!www\.|[a-z]{2,}\.)/i,
     ],
     explanation: 'Đường link không giống trang chính thức; hãy mở qua app/website chính thống.',
   },
@@ -86,15 +97,15 @@ const RULES: Rule[] = [
     signal: 'too_good_to_be_true',
     weight: 'medium',
     keywords: [
-      /lợi\s*nhuận/i,
-      /%\s*\/\s*tháng/i,
-      /quà\s*tặng/i,
-      /trúng\s*thưởng/i,
-      /ưu\s*đãi\s*đặc\s*biệt/i,
-      /lương\s*cao/i,
-      /việc\s*nhẹ\s*lương\s*cao/i,
-      /tiền\s*lãi\s*cao/i,
-      /không\s*cần\s*vốn/i,
+      /loi\s*nhuan/i,
+      /%\s*\/\s*thang/i,
+      /qua\s*tang/i,
+      /trung\s*thuong/i,
+      /uu\s*dai\s*dac\s*biet/i,
+      /luong\s*cao/i,
+      /viec\s*nhe\s*luong\s*cao/i,
+      /tien\s*lai\s*cao/i,
+      /khong\s*can\s*von/i,
     ],
     explanation: 'Lời hứa lợi ích quá hấp dẫn là trigger thường gặp trong scam.',
   },
@@ -102,14 +113,14 @@ const RULES: Rule[] = [
     signal: 'personal_data_request',
     weight: 'high',
     keywords: [
-      /\bOTP\b/i,
-      /CCCD/i,
-      /mật\s*khẩu/i,
-      /tài\s*khoản\s*ngân\s*hàng/i,
-      /ảnh\s*mặt/i,
-      /số\s*thẻ\s*ngân\s*hàng/i,
-      /mã\s*pin/i,
-      /thông\s*tin\s*cá\s*nhân/i,
+      /\botp\b/i,
+      /cccd/i,
+      /mat\s*khaus?/i,
+      /tai\s*khoan\s*ngan\s*hang/i,
+      /anh\s*mat/i,
+      /so\s*the\s*ngan\s*hang/i,
+      /ma\s*pin/i,
+      /thong\s*tin\s*ca\s*nhan/i,
     ],
     explanation: 'Không cung cấp mã OTP/thông tin định danh cho người lạ hoặc link lạ.',
   },
@@ -117,13 +128,13 @@ const RULES: Rule[] = [
     signal: 'social_proof',
     weight: 'medium',
     keywords: [
-      /nhiều\s*người/i,
-      /đã\s*nhận/i,
+      /nhieu\s*nguoi/i,
+      /da\s*nhan/i,
       /testimonial/i,
-      /đánh\s*giá\s*tốt/i,
-      /hài\s*lòng\s*100%/i,
-      /khách\s*hàng\s*thỏa\s*mãn/i,
-      /bình\s*luận\s*tích\s*cực/i,
+      /danh\s*gia\s*tot/i,
+      /hai\s*long\s*100%/i,
+      /khach\s*hang\s*thoa\s*man/i,
+      /binh\s*luan\s*tich\s*cuc/i,
     ],
     explanation: 'Bình luận và ảnh lợi nhuận có thể bị tạo giả hoặc dàn dựng.',
   },
@@ -133,12 +144,15 @@ const RULES: Rule[] = [
 
 /**
  * Evaluate text against all rules.
+ * Text is auto-normalized (diacritics folded) before matching.
  * Returns matched signals with explanations and weights.
  */
 export function evaluateRules(text: string): MatchedSignal[] {
+  // Normalize text before matching (diacritics folded to ASCII)
+  const normalized = foldDiacritics(text).toLowerCase();
   const hits: MatchedSignal[] = [];
   for (const rule of RULES) {
-    if (rule.keywords.some((re) => re.test(text))) {
+    if (rule.keywords.some((re) => re.test(normalized))) {
       hits.push({
         signal: rule.signal,
         explanation: rule.explanation,
