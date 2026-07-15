@@ -153,6 +153,20 @@ docker compose restart
 sudo systemctl enable --now cloudflared
 ```
 
+## Expo Go Testing
+```bash
+# Local tunnel (easiest)
+pnpm expo start --tunnel
+# Scan QR in terminal with Expo Go app
+
+# EAS Update (production-like)
+eas update --branch production
+# In Expo Go: profile → "Enter update URL"
+
+# Development build (best for testing)
+eas build --profile development --platform android
+```
+
 ## Common Pitfalls & Fixes
 
 | Pitfall | Fix |

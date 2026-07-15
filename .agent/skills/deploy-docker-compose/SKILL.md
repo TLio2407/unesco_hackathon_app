@@ -22,8 +22,8 @@ Internet → Cloudflare Edge → Cloudflare Tunnel (cloudflared) → Docker Netw
 
 ```bash
 # Debian/Ubuntu
-curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm64.deb -o cloudflared.deb
-sudo dpkg -i cloudflared.deb
+curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm64.deb -o /tmp/cloudflared.deb
+sudo dpkg -i /tmp/cloudflared.deb
 
 # Verify
 cloudflared --version
@@ -123,8 +123,9 @@ cloudflared tunnel --url http://localhost:8081
 |-------|-----|
 | Tunnel not connecting | Check `cloudflared tunnel info <id>` |
 | 502 Bad Gateway | Ensure web container healthy (`docker ps`) |
-| DNS not resolving | Wait 5 min, check `dig app.yourdomain.com` |
-| Expo Go can't connect | Use HTTPS URL, not HTTP |
+| DNS not resolving | Wait 5 min, check `dig app.domain.com` |
+| Expo Go won't connect | Must use HTTPS URL (Expo Go requires HTTPS) |
+| Tunnel won't start | `journalctl -u cloudflared -f` for logs |
 
 ## References
 - [Cloudflare Tunnel Docs](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/)
