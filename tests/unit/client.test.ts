@@ -20,6 +20,7 @@ describe('createAnalyzeClient', () => {
     };
 
     const client = createAnalyzeClient('https://api.example.com');
+    const originalFetch = global.fetch;
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve(validResponse),
@@ -27,13 +28,14 @@ describe('createAnalyzeClient', () => {
 
     const result = await client.analyze({ kind: 'text', text: 'test' });
     expect(result.riskLevel).toBe('high_risk');
-    delete global.fetch;
+    global.fetch = originalFetch;
   });
 
   it('throws on invalid API response', async () => {
     const invalidResponse = { not: 'valid' };
 
     const client = createAnalyzeClient('https://api.example.com');
+    const originalFetch = global.fetch;
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve(invalidResponse),
@@ -42,6 +44,6 @@ describe('createAnalyzeClient', () => {
     await expect(client.analyze({ kind: 'text', text: 'test' })).rejects.toThrow(
       'Invalid analyze response',
     );
-    delete global.fetch;
+    global.fetch = originalFetch;
   });
 });
