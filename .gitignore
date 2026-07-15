@@ -56,3 +56,4 @@ coverage/
 # EAS local cache (keep eas.json tracked)
 .eas/
 session-*.md
+session-*.md

@@ -203,7 +203,7 @@ export default function MyScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
+  container: { flex: 1, padding: Spacing.four },
 });
 ```
 
@@ -279,37 +279,39 @@ git commit -m "feat(scope): description"
 git push origin feat/my-feature
 ```
 
-## Common Fixes
+## Production Endpoints
 
-| Issue | Fix |
-|-------|-----|
-| `Colors.primaryAction` undefined | Import from `@/theme/tokens` |
-| `t('key')` not found | Add key to both `vi.json` and `en.json` |
-| Style not applied | Check StyleSheet.create syntax |
-| TypeScript error on route | Add route to `src/app/_layout.tsx` |
-| i18n key missing | Check both `vi.json` and `en.json` |
-
-## Production URLs
-
-| Service | URL |
-|---------|-----|
+| Endpoint | URL |
+|----------|-----|
 | Web App | https://unesco.w9.nu |
 | QR Scanner | https://unesco.w9.nu/scan |
 | API Analyze | https://unesco-api.w9.nu/api/analyze |
 | API Health | https://unesco-api.w9.nu/health |
+| Tunnel ID | 45988ce5-cab0-47b2-bb85-4bcad78e8311 |
 
-## Git Hooks (pre-commit)
+## Expo Go Testing
+
 ```bash
-# Add to .git/hooks/pre-commit
-#!/bin/sh
-pnpm typecheck && pnpm test && pnpm lint
+# Local tunnel (easiest)
+pnpm expo start --tunnel
+# Scan QR in terminal with Expo Go app
+
+# EAS Update (production-like)
+eas update --branch production
+# In Expo Go: profile → "Enter update URL"
 ```
 
----
+## Common Pitfalls & Fixes
 
-**Current Status (2026-07-15):**
-- ✅ 216 tests passing
-- ✅ TypeScript clean
-- ✅ Deployed: https://unesco.w9.nu (web) + https://unesco-api.w9.nu (API)
-- ✅ Cloudflare Tunnel active
-- ✅ 216 tests passing, typecheck clean
+| Pitfall | Fix |
+|---------|-----|
+| `ERR_PNPM_OUTDATED_LOCKFILE` in CI | Sync `package.json` + `pnpm-lock.yaml` from main to all branches |
+| `\b` doesn't match Vietnamese text | Omit `\b` for VN words; use `(?<!\p{L})` for unicode-aware boundary |
+| Untracked files on wrong branch | Use `git worktree` for branch isolation |
+| `tsc --noEmit` fails after `sed` edits | Don't use `sed` for TypeScript; Python string replace is safer |
+| TypeScript union `;` breaks type | `| { kind };` closes union — pipe goes BEFORE each variant |
+| WP PRs failing CI after agent build | All agents must run `pnpm typecheck && pnpm test` before push |
+| `toHaveLengthGreaterThan` doesn't exist | Use `.length).toBeGreaterThan(0)` in vitest |
+| Cloudflare Tunnel 502 | Check `docker ps` - service must be healthy |
+| DNS not resolving | Add CNAME records in Cloudflare DNS (Proxied) |
+
