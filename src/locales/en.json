@@ -47,5 +47,20 @@
     "placeholder": "Share a redacted situation summary with a trusted contact.",
     "shareButton": "Share via Zalo/Telegram",
     "redactedNotice": "Sensitive info has been redacted"
+  },
+  "scan": {
+    "title": "Scan",
+    "noPermission": "Camera permission required to scan QR/barcode",
+    "hint": "Place QR/barcode in frame to scan",
+    "analyzing": "Analyzing...",
+    "resultTitle": "Analysis Result",
+    "scanAgain": "Scan Again",
+    "tryAgain": "Try Again"
+  },
+  "risk": {
+    "safe": "Safe",
+    "caution": "Use Caution",
+    "highRisk": "High Risk",
+    "insufficientData": "Insufficient Data"
   }
 }

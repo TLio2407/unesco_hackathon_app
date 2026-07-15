@@ -47,5 +47,20 @@
     "placeholder": "Chia sẻ tóm tắt tình huống với người thân (đã ẩn thông tin nhạy cảm).",
     "shareButton": "Gửi qua Zalo/Telegram",
     "redactedNotice": "Thông tin nhạy cảm đã được ẩn"
+  },
+  "scan": {
+    "title": "Quét mã",
+    "noPermission": "Cần cấp quyền camera để quét mã QR/barcode",
+    "hint": "Đưa mã QR/barcode vào khung để quét",
+    "analyzing": "Đang phân tích...",
+    "resultTitle": "Kết quả phân tích",
+    "scanAgain": "Quét lại",
+    "tryAgain": "Thử lại"
+  },
+  "risk": {
+    "safe": "An toàn",
+    "caution": "Cần cẩn trọng",
+    "highRisk": "Rủi ro cao",
+    "insufficientData": "Chưa đủ dữ liệu"
   }
 }

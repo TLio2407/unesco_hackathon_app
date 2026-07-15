@@ -38,6 +38,13 @@ export default function TabLayout() {
         }} 
       />
       <Tabs.Screen 
+        name="scan" 
+        options={{ 
+          title: 'Quét mã', 
+          tabBarIcon: ({ color }) => <Ionicons name="qr-code" size={28} color={color} /> 
+        }} 
+      />
+      <Tabs.Screen 
         name="profile" 
         options={{ 
           title: 'Cá nhân', 

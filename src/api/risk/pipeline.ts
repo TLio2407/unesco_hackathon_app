@@ -28,8 +28,8 @@ export interface RiskPipeline {
 
 export class DefaultRiskPipeline implements RiskPipeline {
   async run(input: RiskPipelineInput): Promise<RiskPipelineOutput> {
-    // Rule engine uses normalised text (must detect PII keywords like "OTP", "CCCD")
-    const text = input.preprocessed.normalised.lower;
+    // Rule engine uses cleaned text (keeps diacritics for VN keyword matching)
+    const text = input.preprocessed.normalised.cleaned;
     // LLM receives REDACTED text only — zero PII to external services
     const redactedText = input.preprocessed.redacted.text;
 
