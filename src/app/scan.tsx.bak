@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Alert, StyleSheet, TouchableOpacity, View, TextInput, Text } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
 import { createAnalyzeClient } from '@/api/client';
 import type { AnalysisInput } from '@/api/contract';
 import { t } from '@/i18n';
@@ -8,11 +11,16 @@ import { Accessibility, Colors } from '@/theme/tokens';
 import { Spacing } from '@/constants/theme';
 
 export default function ScanScreen() {
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [manualInput, setManualInput] = useState('');
+
+  useEffect(() => {
+    setHasPermission(true);
+  }, []);
 
   const handleAnalyze = async (data: string) => {
     if (loading) return;
@@ -29,16 +37,39 @@ export default function ScanScreen() {
       const output = await client.analyze(input);
       setResult({ type: data.startsWith('http') ? 'url' : 'text', data, output });
     } catch (e) {
-      setError('Error analyzing');
+      setError(t('scan.tryAgain'));
     } finally {
       setLoading(false);
     }
   };
 
+  if (hasPermission === null) {
+    return (
+      <ThemedView style={styles.container}>
+        <ThemedText type="subtitle" style={styles.loadingText}>
+          {t('scan.analyzing')}
+        </ThemedText>
+      </ThemedView>
+    );
+  }
+
+  if (hasPermission === false) {
+    return (
+      <ThemedView style={styles.container}>
+        <ThemedText type="body" style={styles.errorText}>
+          {t('scan.noPermission')}
+        </ThemedText>
+        <TouchableOpacity style={styles.button} onPress={() => Alert.alert(t('scan.noPermission'))}>
+          <ThemedText style={styles.buttonText}>{t('common.ok')}</ThemedText>
+        </TouchableOpacity>
+      </ThemedView>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <View style={styles.overlay}>
-        <View style={styles.inputContainer}>
+    <ThemedView style={styles.container}>
+      <ThemedView style={styles.overlay}>
+        <ThemedView style={styles.inputContainer}>
           <TextInput
             style={styles.input}
             placeholder={t('scan.hint')}
@@ -48,54 +79,56 @@ export default function ScanScreen() {
             autoCorrect={false}
           />
           <TouchableOpacity style={styles.button} onPress={() => handleAnalyze(manualInput)} disabled={loading || !manualInput.trim()}>
-            <Text style={styles.buttonText}>{loading ? t('scan.analyzing') : t('scan.submit')}</Text>
+            <ThemedText style={styles.buttonText}>{loading ? t('scan.analyzing') : t('scan.submit')}</ThemedText>
           </TouchableOpacity>
-        </View>
-      </View>
+        </ThemedView>
+      </ThemedView>
 
       {loading && (
-        <View style={styles.loadingOverlay}>
-          <Text style={styles.loadingText}>{t('scan.analyzing')}</Text>
-        </View>
+        <ThemedView style={styles.loadingOverlay}>
+          <ThemedText type="subtitle" style={styles.loadingText}>
+            {t('scan.analyzing')}
+          </ThemedText>
+        </ThemedView>
       )}
 
       {result && !loading && (
-        <View style={styles.resultOverlay}>
-          <Text style={styles.resultTitle}>
+        <ThemedView style={styles.resultOverlay}>
+          <ThemedText type="subtitle" style={styles.resultTitle}>
             {t('scan.resultTitle')}
-          </Text>
+          </ThemedText>
 
-          <View style={styles.riskBadgeContainer}>
-            <Text style={[
+          <ThemedView style={styles.riskBadgeContainer}>
+            <ThemedText style={[
               styles.riskBadge,
               result.output.riskLevel === 'high_risk' && styles.riskHigh,
               result.output.riskLevel === 'caution' && styles.riskCaution,
               result.output.riskLevel === 'safe' && styles.riskSafe,
             ]}>
               {t(`risk.${result.output.riskLevel}`)}
-            </Text>
-          </View>
+            </ThemedText>
+          </ThemedView>
 
-          <Text style={styles.resultDetail}>
+          <ThemedText style={styles.resultDetail}>
             Loại: {result.type} | Dữ liệu: {result.data.substring(0, 50)}...
-          </Text>
+          </ThemedText>
 
           <TouchableOpacity style={styles.button} onPress={() => { setScanned(false); setManualInput(''); }}>
-            <Text style={styles.buttonText}>{t('scan.scanAgain')}</Text>
+            <ThemedText style={styles.buttonText}>{t('scan.scanAgain')}</ThemedText>
           </TouchableOpacity>
-        </View>
+        </ThemedView>
       )}
 
       {error && (
-        <View style={styles.errorOverlay}>
-          <Text style={styles.errorText}>{error}</Text>
+        <ThemedView style={styles.errorOverlay}>
+          <ThemedText style={styles.errorText}>{error}</ThemedText>
           <TouchableOpacity style={styles.button} onPress={() => { setError(null); setScanned(false); setManualInput(''); }}>
-            <Text style={styles.buttonText}>{t('scan.tryAgain')}</Text>
+            <ThemedText style={styles.buttonText}>{t('scan.tryAgain')}</ThemedText>
           </TouchableOpacity>
-        </View>
+        </ThemedView>
       )}
-    </View>
-  );
+    );
+  }
 }
 
 const styles = StyleSheet.create({
