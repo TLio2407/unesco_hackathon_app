@@ -1,13 +1,14 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { Accessibility } from '@/theme/tokens';
 
 export default function TabLayout() {
   return (
     <Tabs screenOptions={{
-      tabBarActiveTintColor: '#0066CC',
-      tabBarInactiveTintColor: '#888',
-      tabBarLabelStyle: { fontSize: 14, fontWeight: 'bold' }, // Larger font for NCT
-      tabBarStyle: { height: 70, paddingBottom: 10, paddingTop: 10 }, // Taller bar for easy tapping
+      tabBarActiveTintColor: Accessibility.colors.primaryAction,
+      tabBarInactiveTintColor: Accessibility.colors.calmTextSecondary,
+      tabBarLabelStyle: { fontSize: 14, fontWeight: 'bold' },
+      tabBarStyle: { height: 70, paddingBottom: 10, paddingTop: 10 },
     }}>
       <Tabs.Screen 
         name="index" 
@@ -35,14 +36,7 @@ export default function TabLayout() {
         options={{ 
           title: 'Cộng đồng', 
           tabBarIcon: ({ color }) => <Ionicons name="megaphone" size={28} color={color} /> 
-        }} 
-      />
-      <Tabs.Screen 
-        name="scan" 
-        options={{ 
-          title: 'Quét mã', 
-          tabBarIcon: ({ color }) => <Ionicons name="qr-code" size={28} color={color} /> 
-        }} 
+        }}
       />
       <Tabs.Screen 
         name="profile" 

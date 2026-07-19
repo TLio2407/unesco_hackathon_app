@@ -16,6 +16,8 @@
     "sourceText": "Enter text",
     "sourceUrl": "Enter URL",
     "sourceImage": "Upload screenshot",
+    "sourceVoice": "Record voice",
+    "recording": "Recording...",
     "result": {
       "safe": "Safe",
       "caution": "Use Caution",
@@ -46,7 +48,8 @@
     "title": "Trusted Circle",
     "placeholder": "Share a redacted situation summary with a trusted contact.",
     "shareButton": "Share via Zalo/Telegram",
-    "redactedNotice": "Sensitive info has been redacted"
+    "redactedNotice": "Sensitive info has been redacted",
+    "shareSuccess": "Shared successfully"
   },
   "scan": {
     "title": "Scan",

@@ -16,7 +16,7 @@ pnpm expo export --platform web  # Production build
 src/
 ├── app/
 │   ├── _layout.tsx          # Root stack navigator
-│   ├── index.tsx            # Redirect to /tabs
+│   ├── index.tsx            # Redirect to /(tabs)
 │   ├── scan.tsx             # QR/URL/text analysis screen
 │   ├── alert.tsx            # Scam alerts feed
 │   ├── circle.tsx           # Trusted Circle sharing
@@ -60,8 +60,8 @@ src/
 | File | Purpose |
 |------|---------|
 | `src/app/_layout.tsx` | Root stack navigator with all routes |
-| `src/app/tabs/_layout.tsx` | Tab navigator (5 tabs) |
-| `src/app/index.tsx` | Redirects to `/tabs` |
+| `src/app/(tabs)/_layout.tsx` | Tab navigator (5 tabs) |
+| `src/app/index.tsx` | Redirects to `/(tabs)` |
 | `src/app/scan.tsx` | Manual text/URL analysis screen |
 | `src/theme/tokens.ts` | **All design tokens** (Colors, Spacing, Accessibility) |
 | `src/api/contract.ts` | Shared Zod schemas for API |
@@ -248,7 +248,7 @@ import { useRouter } from 'expo-router';
 
 const router = useRouter();
 router.push('/scan');
-router.push('/tabs/learning');
+router.push('/learning');
 router.back();
 ```
 

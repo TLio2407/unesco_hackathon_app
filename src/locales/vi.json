@@ -16,6 +16,8 @@
     "sourceText": "Nhập văn bản",
     "sourceUrl": "Nhập đường link",
     "sourceImage": "Chọn ảnh màn hình",
+    "sourceVoice": "Ghi âm giọng nói",
+    "recording": "Đang ghi âm...",
     "result": {
       "safe": "An toàn",
       "caution": "Cần cẩn trọng",
@@ -46,7 +48,8 @@
     "title": "Người thân",
     "placeholder": "Chia sẻ tóm tắt tình huống với người thân (đã ẩn thông tin nhạy cảm).",
     "shareButton": "Gửi qua Zalo/Telegram",
-    "redactedNotice": "Thông tin nhạy cảm đã được ẩn"
+    "redactedNotice": "Thông tin nhạy cảm đã được ẩn",
+    "shareSuccess": "Đã chia sẻ thành công"
   },
   "scan": {
     "title": "Quét mã",
