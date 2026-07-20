@@ -1,4 +1,5 @@
 import { vi } from 'vitest';
+import React from 'react';
 
 vi.mock('@/i18n', () => {
   const t = (key: string, fallback?: string) => fallback ?? key;
@@ -15,5 +16,5 @@ vi.mock('expo-localization', () => ({
 }));
 
 vi.mock('@expo/vector-icons', () => ({
-  Ionicons: (p: any) => ({ type: 'i', props: p }),
+  Ionicons: (p: any) => React.createElement('i', p),
 }));
