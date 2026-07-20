@@ -148,8 +148,11 @@ export function normalizeUrl(raw: string): string {
   const u = looksLikeDomain && !/^https?:\/\//i.test(trimmed) ? 'https://' + trimmed : trimmed;
   try {
     const parsed = new URL(u);
-    parsed.hostname = parsed.hostname.toLowerCase();
-    return parsed.toString();
+    const lowered = parsed.toString().replace(
+      new RegExp(parsed.hostname, 'i'),
+      parsed.hostname.toLowerCase(),
+    );
+    return lowered;
   } catch {
     return trimmed;
   }
