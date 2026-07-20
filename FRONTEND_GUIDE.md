@@ -10,6 +10,10 @@ pnpm expo start --tunnel    # For Expo Go testing
 pnpm expo export --platform web  # Production build
 ```
 
+## Authentication (MVP Status)
+
+login + OTP verification screens **prototype-only**. No real phone number / OTP validation occurs — `handleLogin`/`handleVerify` navigate straight to main tabs. accepted MVP limitation (audit finding A-005) for UNESCO hackathon demo. Do NOT enter real credentials; none are transmitted or stored.
+
 ## Project Structure
 
 ```
