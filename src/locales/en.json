@@ -75,5 +75,16 @@
     "caution": "Use Caution",
     "highRisk": "High Risk",
     "insufficientData": "Insufficient Data"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "phonePlaceholder": "Phone number",
+      "submit": "Continue"
+    },
+    "verify": {
+      "title": "Verify OTP",
+      "submit": "Confirm"
+    }
   }
 }

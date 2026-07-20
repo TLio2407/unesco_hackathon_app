@@ -75,5 +75,16 @@
     "caution": "Cần cẩn trọng",
     "highRisk": "Rủi ro cao",
     "insufficientData": "Chưa đủ dữ liệu"
+  },
+  "auth": {
+    "login": {
+      "title": "Đăng nhập",
+      "phonePlaceholder": "Số điện thoại",
+      "submit": "Tiếp tục"
+    },
+    "verify": {
+      "title": "Xác thực OTP",
+      "submit": "Xác nhận"
+    }
   }
 }
