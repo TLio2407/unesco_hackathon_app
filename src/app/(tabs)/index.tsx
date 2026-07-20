@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, TextInput, View, Image, Share } from 'react-native';
+import { useState, useRef } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, TextInput, View, Image, Share, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -9,7 +9,6 @@ import { RiskBadge } from '@/components/risk-badge';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { ImagePickerButton } from '@/components/ImagePicker';
-// import { VoiceRecorderButton } from '@/components/VoiceRecorder';
 import { createAnalyzeClient } from '@/api/client';
 import type { AnalyzeOutput, AnalysisInput } from '@/api/contract';
 import { redact } from '@/lib/redact';
@@ -27,6 +26,7 @@ export default function CompanionScreen() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AnalyzeOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
 
   async function onSubmit() {
     if (loading) return;
@@ -57,6 +57,19 @@ export default function CompanionScreen() {
     }
   }
 
+  const handleVoicePress = () => {
+    if (isRecording) {
+      setIsRecording(false);
+      setMode('voice');
+      setMediaUri('mock-voice-uri');
+      setValue('Tôi nhận được cuộc gọi từ số lạ tự xưng là công an nói tôi đang nợ tiền phạt vi phạm giao thông 5 triệu đồng và yêu cầu tôi chuyển khoản ngay để không bị khóa bằng lái.');
+    } else {
+      setIsRecording(true);
+      setResult(null);
+      setMediaUri(null);
+    }
+  };
+
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safe}>
@@ -85,13 +98,22 @@ export default function CompanionScreen() {
               disabled={loading}
               onImageSelected={(uri) => { setMode('image'); setMediaUri(uri); }}
             />
-            <View style={{ flex: 1, minHeight: 100, opacity: 0.5, justifyContent: 'center', alignItems: 'center' }}>
-               <Ionicons name="mic-outline" size={32} color={Accessibility.colors.primaryAction} />
-               <ThemedText style={{ fontSize: 14 }}>{t('companion.sourceVoice')}</ThemedText>
-            </View>
+            <Pressable
+              style={[styles.modeBtn, isRecording && { backgroundColor: Accessibility.colors.riskHigh }]}
+              onPress={handleVoicePress}
+            >
+               <Ionicons
+                name={isRecording ? "stop-circle" : "mic-outline"}
+                size={32}
+                color={isRecording ? "#FFF" : Accessibility.colors.primaryAction}
+               />
+               <ThemedText style={[styles.modeLabel, isRecording && { color: '#FFF' }]}>
+                {isRecording ? t('companion.recording') : t('companion.sourceVoice')}
+               </ThemedText>
+            </Pressable>
           </View>
 
-          {(mode === 'text' || mode === 'url') && (
+          {(mode === 'text' || mode === 'url' || (mode === 'voice' && mediaUri)) && (
             <TextInput
               style={styles.input}
               value={value}
@@ -105,18 +127,23 @@ export default function CompanionScreen() {
             />
           )}
 
-          {mediaUri && (
+          {mediaUri && mode !== 'voice' && (
             <View style={styles.mediaPreview}>
-              {mode === 'image' ? (
+              {mode === 'image' && (
                 <Image source={{ uri: mediaUri }} style={styles.previewImage} />
-              ) : (
-                <View style={styles.voiceInfo}>
-                  <Ionicons name="musical-notes" size={24} color={Accessibility.colors.primaryAction} />
-                  <ThemedText>Ghi âm đã sẵn sàng</ThemedText>
-                </View>
               )}
               <Pressable onPress={() => setMediaUri(null)}>
                 <Ionicons name="close-circle" size={32} color={Accessibility.colors.riskHigh} />
+              </Pressable>
+            </View>
+          )}
+
+          {mode === 'voice' && mediaUri && (
+            <View style={styles.voiceInfo}>
+              <Ionicons name="musical-notes" size={24} color={Accessibility.colors.primaryAction} />
+              <ThemedText style={{ flex: 1 }}>Ghi âm đã chuyển thành văn bản</ThemedText>
+              <Pressable onPress={() => { setMediaUri(null); setValue(''); }}>
+                <Ionicons name="close-circle" size={24} color={Accessibility.colors.riskHigh} />
               </Pressable>
             </View>
           )}
@@ -268,7 +295,14 @@ const styles = StyleSheet.create({
     borderColor: Accessibility.colors.calmTextSecondary,
   },
   previewImage: { width: 100, height: 100, borderRadius: Spacing.two },
-  voiceInfo: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
+  voiceInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+    padding: Spacing.three,
+    backgroundColor: '#E3F2FD',
+    borderRadius: Spacing.two,
+  },
   submit: {
     minHeight: Accessibility.minTouchSize,
     justifyContent: 'center',

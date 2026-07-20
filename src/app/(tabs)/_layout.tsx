@@ -15,7 +15,14 @@ export default function TabLayout() {
         options={{ 
           title: 'Trợ lý AI', 
           tabBarIcon: ({ color }) => <Ionicons name="chatbubbles" size={28} color={color} /> 
-        }} 
+        }}
+      />
+      <Tabs.Screen
+        name="alerts"
+        options={{
+          title: 'Cảnh báo',
+          tabBarIcon: ({ color }) => <Ionicons name="warning" size={28} color={color} />
+        }}
       />
       <Tabs.Screen 
         name="learning" 

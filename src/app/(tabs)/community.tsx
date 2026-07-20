@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, View, Pressable } from 'react-native';
+import { ScrollView, StyleSheet, View, Pressable, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -23,6 +23,12 @@ const MOCK_EVENTS = [
     location: 'Hội người cao tuổi Phường Bến Nghé',
     type: 'Seminar',
   },
+];
+
+const PARTNERS = [
+  { id: 1, name: 'Hội Người cao tuổi Việt Nam', icon: 'people-circle-outline' },
+  { id: 2, name: 'Cục An toàn thông tin', icon: 'shield-checkmark-outline' },
+  { id: 3, name: 'Đoàn Thanh niên (Tình nguyện viên)', icon: 'ribbon-outline' },
 ];
 
 export default function CommunityScreen() {
@@ -58,6 +64,25 @@ export default function CommunityScreen() {
                 </Pressable>
               </ThemedView>
             ))}
+          </View>
+
+          <View style={styles.section}>
+            <ThemedText type="subtitle" style={styles.sectionTitle}>Đối tác tin cậy</ThemedText>
+            <ThemedView type="backgroundElement" style={styles.partnerMap}>
+              {PARTNERS.map(partner => (
+                <View key={partner.id} style={styles.partnerItem}>
+                  <Ionicons name={partner.icon as any} size={40} color={Accessibility.colors.primaryAction} />
+                  <ThemedText style={styles.partnerName}>{partner.name}</ThemedText>
+                </View>
+              ))}
+              <View style={styles.mapHint}>
+                <Ionicons name="map-outline" size={24} color={Accessibility.colors.calmTextSecondary} />
+                <ThemedText style={styles.mapHintText}>Xem bản đồ các điểm hỗ trợ MIL gần cô/chú</ThemedText>
+              </View>
+              <Pressable style={styles.mapBtn}>
+                 <ThemedText style={styles.mapBtnText}>Mở bản đồ đối tác</ThemedText>
+              </Pressable>
+            </ThemedView>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -109,4 +134,22 @@ const styles = StyleSheet.create({
     marginTop: Spacing.one,
   },
   joinBtnText: { color: Accessibility.colors.primaryActionText, fontSize: Accessibility.fontSize.normal, fontWeight: '700' },
+  partnerMap: {
+    padding: Spacing.four,
+    borderRadius: Spacing.four,
+    gap: Spacing.three,
+  },
+  partnerItem: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three },
+  partnerName: { fontSize: Accessibility.fontSize.normal, fontWeight: '600', flex: 1 },
+  mapHint: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two, marginTop: Spacing.two },
+  mapHintText: { fontSize: Accessibility.fontSize.small, color: Accessibility.colors.calmTextSecondary, flex: 1 },
+  mapBtn: {
+    backgroundColor: Accessibility.colors.surfaceCard,
+    borderWidth: 2,
+    borderColor: Accessibility.colors.primaryAction,
+    padding: Spacing.three,
+    borderRadius: Spacing.four,
+    alignItems: 'center',
+  },
+  mapBtnText: { color: Accessibility.colors.primaryAction, fontSize: Accessibility.fontSize.normal, fontWeight: '700' },
 });

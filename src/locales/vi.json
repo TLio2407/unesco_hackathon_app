@@ -49,7 +49,15 @@
     "placeholder": "Chia sẻ tóm tắt tình huống với người thân (đã ẩn thông tin nhạy cảm).",
     "shareButton": "Gửi qua Zalo/Telegram",
     "redactedNotice": "Thông tin nhạy cảm đã được ẩn",
-    "shareSuccess": "Đã chia sẻ thành công"
+    "shareSuccess": "Đã chia sẻ thành công",
+    "addContact": "Thêm người thân",
+    "addContactTitle": "Thêm người thân mới",
+    "nameLabel": "Họ và tên",
+    "namePlaceholder": "Ví dụ: Con trai (Hùng)",
+    "phoneLabel": "Số điện thoại",
+    "phonePlaceholder": "Nhập số điện thoại",
+    "deleteTitle": "Xoá người thân",
+    "deleteConfirm": "Cô/chú có chắc chắn muốn xoá người thân này khỏi vòng tròn tin cậy không?"
   },
   "scan": {
     "title": "Quét mã",
