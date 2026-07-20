@@ -49,6 +49,12 @@ example
 .env
 .env.*
 
+# IDE
+.idea/
+
+# Binary docs (keep local, not in VCS)
+UNESCO_Requirement.pdf
+
 # tests & coverage
 coverage/
 .maestro/
