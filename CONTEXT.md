@@ -119,6 +119,7 @@ WP7 Analytics → Events → Export (JSONL/CSV)
 - **All pure functions 100% unit tested**
 - **Privacy-by-design**: redaction before external calls
 - **`company-*` subagent types only** — never `general`
+- **Mock auth accepted hackathon MVP** — no real OTP validation (finding A-005)
 
 ## Testing
 ```bash

@@ -49,7 +49,15 @@
     "placeholder": "Share a redacted situation summary with a trusted contact.",
     "shareButton": "Share via Zalo/Telegram",
     "redactedNotice": "Sensitive info has been redacted",
-    "shareSuccess": "Shared successfully"
+    "shareSuccess": "Shared successfully",
+    "addContact": "Add contact",
+    "addContactTitle": "Add new trusted contact",
+    "nameLabel": "Full name",
+    "namePlaceholder": "e.g. Son (Hung)",
+    "phoneLabel": "Phone number",
+    "phonePlaceholder": "Enter phone number",
+    "deleteTitle": "Delete contact",
+    "deleteConfirm": "Are you sure you want to remove this contact from your trusted circle?"
   },
   "scan": {
     "title": "Scan",

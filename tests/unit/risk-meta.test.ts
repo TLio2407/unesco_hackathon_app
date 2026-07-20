@@ -19,6 +19,6 @@ describe('riskMeta', () => {
   });
 
   it('falls back to insufficient_data for unknown levels', () => {
-    expect(riskMeta('nope' as RiskLevel).level).toBe('insufficient_data');
+    expect(riskMeta('nope' as RiskLevel).labelKey).toBe('companion.result.insufficientData');
   });
 });
