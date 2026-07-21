@@ -18,8 +18,6 @@ COPY . .
 # Build web app
 RUN pnpm exec expo export --platform web
 
-# Create root index.html from tabs/index.html
-RUN cp /app/dist/tabs/index.html /app/dist/index.html
 
 # Production stage
 FROM nginx:alpine AS runner
