@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Alert, StyleSheet, TouchableOpacity, View, TextInput, Text } from 'react-native';
 
 import { createAnalyzeClient } from '@/api/client';
@@ -116,14 +116,22 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surfaceCard,
   },
   loadingOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: 'rgba(0,0,0,0.7)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   loadingText: { color: Colors.primaryActionText },
   resultOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: 'rgba(0,0,0,0.85)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -142,16 +150,20 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: Accessibility.fontSize.large,
   },
-  riskHigh: { backgroundColor: Colors.riskHigh, color: Colors.riskHighText },
-  riskCaution: { backgroundColor: Colors.riskCaution, color: Colors.riskCautionText },
-  riskSafe: { backgroundColor: Colors.riskSafe, color: Colors.riskSafeText },
+  riskHigh: { backgroundColor: Colors.riskHigh, color: '#FFFFFF' },
+  riskCaution: { backgroundColor: Colors.riskCaution, color: '#FFFFFF' },
+  riskSafe: { backgroundColor: Colors.riskSafe, color: '#FFFFFF' },
   resultDetail: {
     color: Colors.calmTextSecondary,
     marginBottom: Spacing.four,
     textAlign: 'center',
   },
   errorOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: 'rgba(0,0,0,0.85)',
     justifyContent: 'center',
     alignItems: 'center',
