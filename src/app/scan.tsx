@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { BarCodeScanner } from 'expo-barcode-scanner';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 
 import { createAnalyzeClient } from '@/api/client';
@@ -10,24 +10,31 @@ import { Accessibility, Colors } from '@/theme/tokens';
 import { Spacing } from '@/constants/theme';
 
 export default function ScanScreen() {
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const cameraRef = useRef<CameraView>(null);
 
   useEffect(() => {
     (async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === 'granted');
+      if (!permission) return;
+      if (!permission.granted) {
+        const { status } = await requestPermission();
+        if (status !== 'granted') {
+          Alert.alert(t('scan.noPermission'));
+        }
+      }
     })();
-  }, []);
+  }, [permission, requestPermission]);
 
-  const handleBarCodeScanned = async ({ type, data }: { type: string; data: string }) => {
+  const handleBarCodeScanned = async ({ data }: { data: string }) => {
     if (scanned) return;
     setScanned(true);
     setLoading(true);
     setError(null);
+    cameraRef.current?.stopRecording();
 
     const client = createAnalyzeClient();
     const input: AnalysisInput = data.startsWith('http')
@@ -36,7 +43,7 @@ export default function ScanScreen() {
 
     try {
       const output = await client.analyze(input);
-      setResult({ type, data, output });
+      setResult({ data, output });
     } catch {
       setError(t('scan.tryAgain'));
     } finally {
@@ -44,7 +51,7 @@ export default function ScanScreen() {
     }
   };
 
-  if (hasPermission === null) {
+  if (!permission) {
     return (
       <View style={styles.container}>
         <Text style={styles.loadingText}>{t('scan.analyzing')}</Text>
@@ -52,11 +59,11 @@ export default function ScanScreen() {
     );
   }
 
-  if (hasPermission === false) {
+  if (!permission.granted) {
     return (
       <View style={styles.container}>
         <Text style={styles.errorText}>{t('scan.noPermission')}</Text>
-        <TouchableOpacity style={styles.button} onPress={() => Alert.alert(t('scan.noPermission'))}>
+        <TouchableOpacity style={styles.button} onPress={requestPermission}>
           <Text style={styles.buttonText}>{t('common.ok')}</Text>
         </TouchableOpacity>
       </View>
@@ -65,8 +72,12 @@ export default function ScanScreen() {
 
   return (
     <View style={styles.container}>
-      <BarCodeScanner
-        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+      <CameraView
+        ref={cameraRef}
+        onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+        barcodeScannerSettings={{
+          barcodes: ['qr_code'],
+        }}
         style={StyleSheet.absoluteFillObject}
       />
       <View style={styles.overlay}>
@@ -99,7 +110,7 @@ export default function ScanScreen() {
           </View>
 
           <Text style={styles.resultDetail}>
-            Loại: {result.type} | Dữ liệu: {result.data.substring(0, 50)}...
+            Dữ liệu: {result.data.substring(0, 50)}...
           </Text>
 
           <TouchableOpacity style={styles.button} onPress={() => { setScanned(false); setResult(null); }}>
@@ -209,5 +220,4 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textAlign: 'center',
   },
-  loadingText: { color: Colors.primaryActionText },
 });

@@ -10,7 +10,7 @@
         "./assets/*"
       ]
     },
-    "types": ["node", "vitest", "jest"]
+    "types": ["node", "vitest/globals"]
   },
   "include": [
     "**/*.ts",

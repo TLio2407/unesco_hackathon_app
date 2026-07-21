@@ -12,28 +12,24 @@ export type { LlmPrompt, LlmResponse };
 
 // ── Prompt templates ─────────────────────────────────────────────────────────
 
-const SYSTEM_PROMPT = `Bạn là trợ lý AI hỗ trợ người cao tuổi Việt Nam nhận diện rủi ro trong tin nhắn.
+const SYSTEM_PROMPT = `Bạn là trợ lý an toàn cho người cao tuổi Việt Nam. Nhiệm vụ: phân tích tin nhắn và báo mức độ lừa đảo.
 
-Hướng dẫn:
-- Giải thích bằng tiếng Việt đơn giản, không dùng thuật ngữ kỹ thuật.
-- Không đưa lời khuyên y tế, pháp lý, tài chính.
-- Luôn khuyến nghị người dùng xác minh qua kênh chính thức.
-- Giữ tone bình tĩnh, không gây hoảng loạn.
+PHẢI TRẢ VỀ TIẾNG VIỆT, ĐƠN GIẢN, KHÔNG THUẬT NGỮ KỸ THUẬT.
+KHÔNG đưa lời khuyên y tế/pháp lý/tài chính.
+LUÔN khuyên xác minh qua kênh chính thức.
 
-Cấu trúc trả lời:
-1. Giải thích ngắn gọn vì sao tin nhắn đáng nghi (dựa trên các dấu hiệu được cung cấp).
-2. Đề xuất 3-5 bước hành động cụ thể (ví dụ: "Dừng lại 2 phút", "Mở app chính thức", "Gọi hotline", "Hỏi người thân").
-3. Tóm tắt hành động tiếp theo trong 1 câu ngắn.
+TRẢ LỜI THEO 3 PHẦN RÕ RÀNG:
+Phần 1: Giải thích ngắn gọn tại sao đáng nghi.
+Phần 2: Bước hành động - viết mỗi bước trên 1 dòng bắt đầu bằng dấu gạch ngang (-).
+Phần 3: Hành động tiếp theo - 1 câu duy nhất tóm tắt.
 
-Ví dụ:
-Dấu hiệu: urgency, upfront_payment
-Giải thích: Tin nhắn đang ép bạn quyết định nhanh và yêu cầu chuyển tiền trước. Đây là chiêu thức phổ biến của lừa đảo.
+Ví dụ cấu trúc:
+Giải thích: [lý do đáng nghi trong 1-2 câu]
 Bước hành động:
 - Dừng lại 2 phút, không chuyển tiền ngay.
-- Mở app ngân hàng chính thức (không qua link trong tin nhắn).
-- Gọi số hotline trên website chính thức để xác nhận.
-- Nếu chưa chắc, hỏi con/cháu hoặc người thân tin cậy.
-Hành động tiếp theo: Dừng lại 2 phút – Không chuyển tiền ngay – Xác nhận qua kênh độc lập.`;
+- Mở app/website chính thức để xác nhận.
+- Gọi hotline chính thức để kiểm tra.
+Hành động tiếp theo: [1 câu ngắn]`;
 
 // ── Template fallback (if LLM unavailable) ────────────────────────────────────
 
@@ -85,27 +81,17 @@ export class MockLlmClient implements LlmClient {
 let _llmClient: LlmClient | undefined;
 
 async function loadLlmClient(): Promise<LlmClient> {
+  // Try real Google AI Studio client first
   try {
-    // In browser/Cloudflare Workers, use global fetch
-    if (typeof fetch === 'function') {
-      // Use Cloudflare Workers AI or OpenAI-compatible
-      return new CloudflareLlmClient();
+    const { getGoogleAiClient } = await import('../llm-client');
+    const client = getGoogleAiClient();
+    if (client.isConfigured) {
+      return client;
     }
-    // In Node.js, use OpenAI SDK
-    // openai not a dependency in this project; use mock only
-    return new MockLlmClient();
   } catch {
-    return new MockLlmClient();
+    // llm-client not available (e.g. in tests), fall through
   }
-}
-
-// Cloudflare Workers AI client
-class CloudflareLlmClient implements LlmClient {
-  async generate(prompt: LlmPrompt): Promise<LlmResponse> {
-    // In a real implementation, call Cloudflare Workers AI
-    // For now, use mock
-    return new MockLlmClient().generate(prompt);
-  }
+  return new MockLlmClient();
 }
 
 // ── Explanation generator ────────────────────────────────────────────────────
@@ -136,7 +122,7 @@ export async function generateExplanation(
     const client = await loadLlmClient();
     return await client.generate(prompt);
   } catch {
-    // Fallback to template
+    // Fallback to template when LLM unavailable or fails
     return buildTemplateExplanation(signals);
   }
 }

@@ -47,6 +47,7 @@ example
 
 # env / secrets
 .env
+!.env.example
 .env.*
 
 # IDE
