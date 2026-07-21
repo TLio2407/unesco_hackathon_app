@@ -1,5 +1,7 @@
-import { useState } from 'react';
-import { Alert, StyleSheet, TouchableOpacity, View, TextInput, Text } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { BarCodeScanner } from 'expo-barcode-scanner';
+import { Ionicons } from '@expo/vector-icons';
 
 import { createAnalyzeClient } from '@/api/client';
 import type { AnalysisInput } from '@/api/contract';
@@ -8,14 +10,21 @@ import { Accessibility, Colors } from '@/theme/tokens';
 import { Spacing } from '@/constants/theme';
 
 export default function ScanScreen() {
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
-  const [manualInput, setManualInput] = useState('');
 
-  const handleAnalyze = async (data: string) => {
-    if (loading) return;
+  useEffect(() => {
+    (async () => {
+      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      setHasPermission(status === 'granted');
+    })();
+  }, []);
+
+  const handleBarCodeScanned = async ({ type, data }: { type: string; data: string }) => {
+    if (scanned) return;
     setScanned(true);
     setLoading(true);
     setError(null);
@@ -27,29 +36,43 @@ export default function ScanScreen() {
 
     try {
       const output = await client.analyze(input);
-      setResult({ type: data.startsWith('http') ? 'url' : 'text', data, output });
+      setResult({ type, data, output });
     } catch (e) {
-      setError('Error analyzing');
+      setError(t('scan.tryAgain'));
     } finally {
       setLoading(false);
     }
   };
 
+  if (hasPermission === null) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.loadingText}>{t('scan.analyzing')}</Text>
+      </View>
+    );
+  }
+
+  if (hasPermission === false) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>{t('scan.noPermission')}</Text>
+        <TouchableOpacity style={styles.button} onPress={() => Alert.alert(t('scan.noPermission'))}>
+          <Text style={styles.buttonText}>{t('common.ok')}</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
+      <BarCodeScanner
+        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+        style={StyleSheet.absoluteFillObject}
+      />
       <View style={styles.overlay}>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder={t('scan.hint')}
-            value={manualInput}
-            onChangeText={setManualInput}
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-          <TouchableOpacity style={styles.button} onPress={() => handleAnalyze(manualInput)} disabled={loading || !manualInput.trim()}>
-            <Text style={styles.buttonText}>{loading ? t('scan.analyzing') : t('scan.submit')}</Text>
-          </TouchableOpacity>
+        <View style={styles.scanFrame}>
+          <Ionicons name="qr-code" size={48} color={Colors.primaryAction} />
+          <Text style={styles.scanHint}>{t('scan.hint')}</Text>
         </View>
       </View>
 
@@ -61,17 +84,16 @@ export default function ScanScreen() {
 
       {result && !loading && (
         <View style={styles.resultOverlay}>
-          <Text style={styles.resultTitle}>
-            {t('scan.resultTitle')}
-          </Text>
+          <Text style={styles.resultTitle}>{t('scan.resultTitle')}</Text>
 
           <View style={styles.riskBadgeContainer}>
-            <Text style={[
-              styles.riskBadge,
-              result.output.riskLevel === 'high_risk' && styles.riskHigh,
-              result.output.riskLevel === 'caution' && styles.riskCaution,
-              result.output.riskLevel === 'safe' && styles.riskSafe,
-            ]}>
+            <Text
+              style={[
+                styles.riskBadge,
+                result.output.riskLevel === 'high_risk' && styles.riskHigh,
+                result.output.riskLevel === 'caution' && styles.riskCaution,
+                result.output.riskLevel === 'safe' && styles.riskSafe,
+              ]}>
               {t(`risk.${result.output.riskLevel}`)}
             </Text>
           </View>
@@ -80,7 +102,7 @@ export default function ScanScreen() {
             Loại: {result.type} | Dữ liệu: {result.data.substring(0, 50)}...
           </Text>
 
-          <TouchableOpacity style={styles.button} onPress={() => { setScanned(false); setManualInput(''); }}>
+          <TouchableOpacity style={styles.button} onPress={() => { setScanned(false); setResult(null); }}>
             <Text style={styles.buttonText}>{t('scan.scanAgain')}</Text>
           </TouchableOpacity>
         </View>
@@ -89,7 +111,7 @@ export default function ScanScreen() {
       {error && (
         <View style={styles.errorOverlay}>
           <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={styles.button} onPress={() => { setError(null); setScanned(false); setManualInput(''); }}>
+          <TouchableOpacity style={styles.button} onPress={() => { setError(null); setScanned(false); }}>
             <Text style={styles.buttonText}>{t('scan.tryAgain')}</Text>
           </TouchableOpacity>
         </View>
@@ -100,20 +122,20 @@ export default function ScanScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  overlay: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: Spacing.four },
-  inputContainer: {
-    width: '100%',
-    maxWidth: 320,
-    gap: Spacing.three,
+  overlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: Spacing.four,
   },
-  input: {
-    borderWidth: 2,
-    borderColor: Colors.primaryAction,
-    borderRadius: Spacing.three,
-    padding: Spacing.three,
+  scanFrame: {
+    alignItems: 'center',
+    gap: Spacing.two,
+  },
+  scanHint: {
     fontSize: Accessibility.fontSize.normal,
-    color: Colors.calmText,
-    backgroundColor: Colors.surfaceCard,
+    color: Colors.primaryActionText,
+    textAlign: 'center',
   },
   loadingOverlay: {
     position: 'absolute',
@@ -187,4 +209,5 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textAlign: 'center',
   },
+  loadingText: { color: Colors.primaryActionText },
 });
