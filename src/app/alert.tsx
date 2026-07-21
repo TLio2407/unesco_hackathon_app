@@ -39,6 +39,5 @@ const styles = StyleSheet.create({
   body: {
     fontSize: Accessibility.fontSize.normal,
     lineHeight: 28,
-    color: Accessibility.colors.calmText,
   },
 });

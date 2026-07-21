@@ -72,11 +72,15 @@ export default function TabTwoScreen() {
           {MODULES.map((m) => (
             <Pressable
               key={m.key}
-              style={({ pressed }) => [styles.moduleButton, pressed && styles.modulePressed]}
+              style={({ pressed }) => [
+                styles.moduleButton,
+                { borderColor: theme.primaryAction, backgroundColor: theme.surfaceCard },
+                pressed && styles.modulePressed
+              ]}
               onPress={() => router.push(m.route)}
               accessibilityRole="button"
               accessibilityLabel={t(`${m.key}.title`)}>
-              <ThemedText style={styles.moduleLabel}>{t(`${m.key}.title`)}</ThemedText>
+              <ThemedText style={[styles.moduleLabel, { color: theme.primaryAction }]}>{t(`${m.key}.title`)}</ThemedText>
             </Pressable>
           ))}
         </ThemedView>
@@ -197,15 +201,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: Spacing.four,
     borderWidth: 2,
-    borderColor: Accessibility.colors.primaryAction,
-    backgroundColor: Accessibility.colors.surfaceCard,
     paddingHorizontal: Spacing.four,
   },
   modulePressed: { opacity: 0.8 },
   moduleLabel: {
     fontSize: Accessibility.fontSize.normal,
     fontWeight: '600',
-    color: Accessibility.colors.primaryAction,
   },
   collapsibleContent: {
     alignItems: 'center',
