@@ -44,7 +44,7 @@ export default function CompanionScreen() {
     } else if (mode === 'image' && mediaUri) {
       input = { kind: 'image', ref: mediaUri };
     } else if (mode === 'voice' && mediaUri) {
-      input = { kind: 'voice', data: mediaUri, mimeType: 'audio/m4a' };
+      input = { kind: 'voice', data: value, mimeType: 'audio/m4a' };
     } else {
       setLoading(false);
       return;
