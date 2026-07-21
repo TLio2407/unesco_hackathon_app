@@ -7,8 +7,11 @@ import type { RiskLevel } from '@/api/contract';
 import { Accessibility } from '@/theme/tokens';
 import { Spacing } from '@/constants/theme';
 
+import { useTheme } from '@/hooks/use-theme';
+
 export function RiskBadge({ level }: { level: RiskLevel }) {
-  const meta = riskMeta(level);
+  const theme = useTheme();
+  const meta = riskMeta(level, theme);
   return (
     <View style={[styles.badge, { backgroundColor: meta.background, borderColor: meta.color }]}>
       <View style={[styles.dot, { backgroundColor: meta.color }]} />

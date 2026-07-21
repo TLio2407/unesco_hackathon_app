@@ -9,18 +9,38 @@ import { Platform } from 'react-native';
 
 export const Colors = {
   light: {
-    text: '#000000',
-    background: '#ffffff',
-    backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
+    text: '#1C1917', // Warm stone-black
+    background: '#FCFBF9', // Soft cream off-white to prevent glare
+    backgroundElement: '#F5F2EB',
+    backgroundSelected: '#EAE5DB',
+    textSecondary: '#57534E', // Stone-gray
+
+    primaryAction: '#1D4ED8', // Solid high-contrast blue
+    primaryActionText: '#FFFFFF',
+    surfaceCard: '#FFFFFF',
+    surfaceElevated: '#F5F5F4',
+
+    riskSafe: '#15803D',
+    riskCaution: '#B45309',
+    riskHigh: '#B91C1C',
+    riskInsufficient: '#78716C',
   },
   dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
+    text: '#F5F5F4', // Warm stone off-white to prevent halo/glare
+    background: '#1C1917', // Warm charcoal background instead of pure black
+    backgroundElement: '#292524',
+    backgroundSelected: '#44403C',
+    textSecondary: '#D6D3D1', // High contrast soft gray
+
+    primaryAction: '#3B82F6', // High visibility blue
+    primaryActionText: '#FFFFFF',
+    surfaceCard: '#292524',
+    surfaceElevated: '#3E3A36',
+
+    riskSafe: '#4ADE80',
+    riskCaution: '#FBBF24',
+    riskHigh: '#F87171',
+    riskInsufficient: '#A8A29E',
   },
 } as const;
 

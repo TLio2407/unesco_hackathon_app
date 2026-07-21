@@ -15,11 +15,13 @@ import { redact } from '@/lib/redact';
 import { t } from '@/i18n';
 import { Accessibility } from '@/theme/tokens';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
 
 const client = createAnalyzeClient();
 type Mode = 'text' | 'url' | 'image' | 'voice';
 
 export default function CompanionScreen() {
+  const theme = useTheme();
   const [mode, setMode] = useState<Mode>('text');
   const [value, setValue] = useState('');
   const [mediaUri, setMediaUri] = useState<string | null>(null);
@@ -99,23 +101,23 @@ export default function CompanionScreen() {
               onImageSelected={(uri) => { setMode('image'); setMediaUri(uri); }}
             />
             <Pressable
-              style={[styles.modeBtn, isRecording && { backgroundColor: Accessibility.colors.riskHigh }]}
+              style={[styles.modeBtn, { borderColor: theme.primaryAction, backgroundColor: theme.surfaceCard }, isRecording && { backgroundColor: theme.riskHigh, borderColor: theme.riskHigh }]}
               onPress={handleVoicePress}
             >
                <Ionicons
-                name={isRecording ? "stop-circle" : "mic-outline"}
-                size={32}
-                color={isRecording ? "#FFF" : Accessibility.colors.primaryAction}
+                 name={isRecording ? "stop-circle" : "mic-outline"}
+                 size={32}
+                 color={isRecording ? "#FFF" : theme.primaryAction}
                />
                <ThemedText style={[styles.modeLabel, isRecording && { color: '#FFF' }]}>
-                {isRecording ? t('companion.recording') : t('companion.sourceVoice')}
+                 {isRecording ? t('companion.recording') : t('companion.sourceVoice')}
                </ThemedText>
             </Pressable>
           </View>
 
           {(mode === 'text' || mode === 'url' || (mode === 'voice' && mediaUri)) && (
             <TextInput
-              style={styles.input}
+              style={[styles.input, { borderColor: theme.textSecondary, color: theme.text, backgroundColor: theme.surfaceCard }]}
               value={value}
               onChangeText={setValue}
               placeholder={t('companion.inputPlaceholder')}
@@ -128,38 +130,38 @@ export default function CompanionScreen() {
           )}
 
           {mediaUri && mode !== 'voice' && (
-            <View style={styles.mediaPreview}>
+            <View style={[styles.mediaPreview, { backgroundColor: theme.surfaceCard, borderColor: theme.textSecondary }]}>
               {mode === 'image' && (
                 <Image source={{ uri: mediaUri }} style={styles.previewImage} />
               )}
               <Pressable onPress={() => setMediaUri(null)}>
-                <Ionicons name="close-circle" size={32} color={Accessibility.colors.riskHigh} />
+                <Ionicons name="close-circle" size={32} color={theme.riskHigh} />
               </Pressable>
             </View>
           )}
 
           {mode === 'voice' && mediaUri && (
-            <View style={styles.voiceInfo}>
-              <Ionicons name="musical-notes" size={24} color={Accessibility.colors.primaryAction} />
+            <View style={[styles.voiceInfo, { backgroundColor: theme.backgroundElement }]}>
+              <Ionicons name="musical-notes" size={24} color={theme.primaryAction} />
               <ThemedText style={{ flex: 1 }}>Ghi âm đã chuyển thành văn bản</ThemedText>
               <Pressable onPress={() => { setMediaUri(null); setValue(''); }}>
-                <Ionicons name="close-circle" size={24} color={Accessibility.colors.riskHigh} />
+                <Ionicons name="close-circle" size={24} color={theme.riskHigh} />
               </Pressable>
             </View>
           )}
 
           <Pressable
-            style={({ pressed }) => [styles.submit, pressed && styles.submitPressed]}
+            style={({ pressed }) => [styles.submit, { backgroundColor: theme.primaryAction }, pressed && styles.submitPressed]}
             onPress={onSubmit}
             disabled={loading || (mode === 'text' || mode === 'url' ? !value.trim() : !mediaUri)}>
-            <ThemedText style={styles.submitText}>
+            <ThemedText style={[styles.submitText, { color: theme.primaryActionText }]}>
               {loading ? t('common.loading') : t('companion.submit')}
             </ThemedText>
           </Pressable>
 
-          {loading && <ActivityIndicator style={styles.loader} size="large" color={Accessibility.colors.primaryAction} />}
+          {loading && <ActivityIndicator style={styles.loader} size="large" color={theme.primaryAction} />}
           {error && (
-            <ThemedText style={[styles.body, { color: Accessibility.colors.riskHigh }]}>{error}</ThemedText>
+            <ThemedText style={[styles.body, { color: theme.riskHigh }]}>{error}</ThemedText>
           )}
 
           {result && <ResultCard result={result} />}
@@ -170,16 +172,18 @@ export default function CompanionScreen() {
 }
 
 function ModeButton({ active, label, icon, onPress }: { active: boolean; label: string; icon: any; onPress: () => void }) {
+  const theme = useTheme();
   return (
     <Pressable
       style={({ pressed }) => [
         styles.modeBtn,
-        active && styles.modeBtnActive,
+        { borderColor: theme.primaryAction, backgroundColor: theme.surfaceCard },
+        active && { backgroundColor: theme.primaryAction },
         pressed && styles.modeBtnPressed,
       ]}
       onPress={onPress}>
-      <Ionicons name={icon} size={32} color={active ? Accessibility.colors.primaryActionText : Accessibility.colors.primaryAction} />
-      <ThemedText style={[styles.modeLabel, active && { color: Accessibility.colors.primaryActionText }]}>
+      <Ionicons name={icon} size={32} color={active ? theme.primaryActionText : theme.primaryAction} />
+      <ThemedText style={[styles.modeLabel, active && { color: theme.primaryActionText }]}>
         {label}
       </ThemedText>
     </Pressable>
@@ -187,6 +191,7 @@ function ModeButton({ active, label, icon, onPress }: { active: boolean; label: 
 }
 
 function ResultCard({ result }: { result: AnalyzeOutput }) {
+  const theme = useTheme();
   async function onShare() {
     const summary = `An Tâm Số - Kết quả phân tích rủi ro: ${t(`risk.${result.riskLevel}`)}\n\n` +
       `Dấu hiệu:\n${result.redFlags.map(f => `- ${f.explanation}`).join('\n')}\n\n` +
@@ -213,15 +218,15 @@ function ResultCard({ result }: { result: AnalyzeOutput }) {
         </View>
       )}
 
-      <Pressable style={styles.shareBtn} onPress={onShare}>
-        <Ionicons name="share-social" size={24} color={Accessibility.colors.primaryActionText} />
-        <ThemedText style={styles.shareBtnText}>{t('companion.trustedCircle')}</ThemedText>
+      <Pressable style={[styles.shareBtn, { backgroundColor: theme.primaryAction }]} onPress={onShare}>
+        <Ionicons name="share-social" size={24} color={theme.primaryActionText} />
+        <ThemedText style={[styles.shareBtnText, { color: theme.primaryActionText }]}>{t('companion.trustedCircle')}</ThemedText>
       </Pressable>
 
       {result.lessonCard && <LessonCard card={result.lessonCard} />}
 
       {result.disclaimer && (
-        <ThemedText style={styles.disclaimer}>{result.disclaimer}</ThemedText>
+        <ThemedText themeColor="textSecondary" style={styles.disclaimer}>{result.disclaimer}</ThemedText>
       )}
     </View>
   );
@@ -265,23 +270,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: Spacing.four,
     borderWidth: 2,
-    borderColor: Accessibility.colors.primaryAction,
-    backgroundColor: Accessibility.colors.surfaceCard,
     padding: Spacing.two,
     gap: Spacing.one,
   },
-  modeBtnActive: { backgroundColor: Accessibility.colors.primaryAction },
+  modeBtnActive: {},
   modeBtnPressed: { opacity: 0.8 },
   modeLabel: { fontSize: Accessibility.fontSize.normal, fontWeight: '600', textAlign: 'center' },
   input: {
     minHeight: 120,
     borderRadius: Spacing.four,
     borderWidth: 2,
-    borderColor: Accessibility.colors.calmTextSecondary,
     padding: Spacing.three,
     fontSize: Accessibility.fontSize.normal,
-    color: Accessibility.colors.calmText,
-    backgroundColor: Accessibility.colors.surfaceCard,
     textAlignVertical: 'top',
   },
   mediaPreview: {
@@ -290,9 +290,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: Spacing.three,
     borderRadius: Spacing.four,
-    backgroundColor: Accessibility.colors.surfaceCard,
     borderWidth: 1,
-    borderColor: Accessibility.colors.calmTextSecondary,
   },
   previewImage: { width: 100, height: 100, borderRadius: Spacing.two },
   voiceInfo: {
@@ -300,7 +298,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.two,
     padding: Spacing.three,
-    backgroundColor: '#E3F2FD',
     borderRadius: Spacing.two,
   },
   submit: {
@@ -308,32 +305,29 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: Spacing.four,
-    backgroundColor: Accessibility.colors.primaryAction,
     marginTop: Spacing.two,
   },
   submitPressed: { opacity: 0.85 },
-  submitText: { color: Accessibility.colors.primaryActionText, fontSize: Accessibility.fontSize.large, fontWeight: '700' },
+  submitText: { fontSize: Accessibility.fontSize.large, fontWeight: '700' },
   loader: { alignSelf: 'center', marginVertical: Spacing.three },
   result: { gap: Spacing.four, alignSelf: 'stretch', marginTop: Spacing.two },
   block: { gap: Spacing.two, alignSelf: 'stretch' },
   blockTitle: { fontSize: Accessibility.fontSize.large, fontWeight: '700' },
   item: { flexDirection: 'row', gap: Spacing.two, alignItems: 'flex-start' },
   bullet: { fontSize: Accessibility.fontSize.normal, lineHeight: 28 },
-  body: { flex: 1, fontSize: Accessibility.fontSize.normal, lineHeight: 28, color: Accessibility.colors.calmText },
+  body: { flex: 1, fontSize: Accessibility.fontSize.normal, lineHeight: 28 },
   shareBtn: {
     flexDirection: 'row',
-    backgroundColor: Accessibility.colors.primaryAction,
     padding: Spacing.three,
     borderRadius: Spacing.four,
     justifyContent: 'center',
     alignItems: 'center',
     gap: Spacing.two,
   },
-  shareBtnText: { color: Accessibility.colors.primaryActionText, fontSize: Accessibility.fontSize.normal, fontWeight: '700' },
+  shareBtnText: { fontSize: Accessibility.fontSize.normal, fontWeight: '700' },
   disclaimer: {
     fontSize: Accessibility.fontSize.small,
     fontStyle: 'italic',
-    color: Accessibility.colors.calmTextSecondary,
     lineHeight: 24,
   },
 });
