@@ -35,4 +35,39 @@ describe('mockAnalyze', () => {
     const out = await mockAnalyze({ kind: 'text', text: 'Chúc mừng sinh nhật bà nhé, tối nay ăn cơm cùng gia đình.' });
     expect(out.riskLevel).toBe('safe');
   });
+
+  it('flags suspicious URLs as high_risk or caution', async () => {
+    const suspiciousUrls = [
+      'http://bit.ly/otp-verify',
+      'http://tinyurl.com/chuyen-tien',
+      'http://goo.gl/giu-vi-tri',
+    ];
+    for (const url of suspiciousUrls) {
+      const out = await mockAnalyze({ kind: 'url', url });
+      expect(['caution', 'high_risk']).toContain(out.riskLevel);
+      expect(out.redFlags.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('returns safe for legitimate URLs', async () => {
+    const legitimateUrls = [
+      'https://unesco.org',
+      'https://www.google.com',
+      'https://banking.gov.vn',
+      'https://zalo.me',
+    ];
+    for (const url of legitimateUrls) {
+      const out = await mockAnalyze({ kind: 'url', url });
+      expect(out.riskLevel).toBe('safe');
+      expect(out.redFlags).toHaveLength(0);
+    }
+  });
+
+  it('flags URL with scam keywords as caution', async () => {
+    const out = await mockAnalyze({
+      kind: 'url',
+      url: 'http://bit.ly/giu-vi-tri-trung-thuong',
+    });
+    expect(['caution', 'high_risk']).toContain(out.riskLevel);
+  });
 });

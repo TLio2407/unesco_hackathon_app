@@ -115,9 +115,32 @@ export const mockAnalyze: AnalyzeClient['analyze'] = async (
 ): Promise<AnalyzeOutput> => {
   if (input.kind === 'text') return analyzeText(input.text);
   if (input.kind === 'url') {
-    const suspicious = /bit\.ly|tinyurl|http/i.test(input.url);
+    // Check for suspicious URL patterns commonly used in scams
+    // Focus on shorteners, unusual TLDs, and scam-specific keywords
+    const suspiciousPatterns = [
+      /bit\.ly/i,
+      /tinyurl/i,
+      /goo\.gl/i,
+      /short\.url/i,
+      /link\.vn/i,
+      /\.tk$/i,
+      /\.ml$/i,
+      /\.ga$/i,
+      /\.cf$/i,
+      /otp/i,
+      /chuyển\s*tiền/i,
+      /chứng\s*nhận/i,
+      /xác\s*minh/i,
+      /giữ\s*vị\s*trí/i,
+      /trúng\s*thưởng/i,
+      /được\s*chọn/i,
+      /vị\s*trí\s*trúng/i,
+    ];
+    const isSuspicious = suspiciousPatterns.some((re) => re.test(input.url));
     return analyzeText(
-      suspicious ? `bấm link ${input.url} ngay để nhận quà tặng` : 'trang web chính thức'
+      isSuspicious
+        ? `bấm link ${input.url} ngay để nhận quà tặng`
+        : `trang web chính thức: ${input.url}`
     );
   }
   // image: OCR is backend; mock cannot read pixels
