@@ -12,7 +12,7 @@ console.log(`[server] AI mode: ${hasRealAI ? 'Google AI Studio (real)' : 'mock'}
 console.log(`[server] Model: ${process.env.AI_MODEL || 'gemma-4-31b-it'}`);
 
 // Health check
-app.get('/health', (req, res) => {
+app.get(['/health', '/api/health'], (req, res) => {
   res.json({
     status: 'ok',
     ai: hasRealAI ? 'real' : 'mock',
