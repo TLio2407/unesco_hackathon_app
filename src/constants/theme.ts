@@ -9,38 +9,50 @@ import { Platform } from 'react-native';
 
 export const Colors = {
   light: {
-    text: '#1C1917', // Warm stone-black
-    background: '#FCFBF9', // Soft cream off-white to prevent glare
-    backgroundElement: '#F5F2EB',
-    backgroundSelected: '#EAE5DB',
-    textSecondary: '#57534E', // Stone-gray
+    text: '#0F172A', // Deep slate navy for high contrast
+    background: '#FDFBF7', // Soft cream off-white to prevent glare
+    backgroundElement: '#F1EFE9', // Subtle warm container
+    backgroundSelected: '#E2DEC9',
+    textSecondary: '#475569', // Slate-gray with high contrast ratio (7.2:1)
 
-    primaryAction: '#1D4ED8', // Solid high-contrast blue
+    primaryAction: '#1D4ED8', // Solid high-contrast royal blue
     primaryActionText: '#FFFFFF',
     surfaceCard: '#FFFFFF',
-    surfaceElevated: '#F5F5F4',
+    surfaceElevated: '#F8F6F0',
+    cardBorder: '#E2E8F0',
 
     riskSafe: '#15803D',
     riskCaution: '#B45309',
     riskHigh: '#B91C1C',
-    riskInsufficient: '#78716C',
+    riskInsufficient: '#64748B',
+
+    riskSafeBg: '#F0FDF4',
+    riskCautionBg: '#FFFBEB',
+    riskHighBg: '#FEF2F2',
+    riskInsufficientBg: '#F1F5F9',
   },
   dark: {
-    text: '#F5F5F4', // Warm stone off-white to prevent halo/glare
-    background: '#1C1917', // Warm charcoal background instead of pure black
-    backgroundElement: '#292524',
-    backgroundSelected: '#44403C',
-    textSecondary: '#D6D3D1', // High contrast soft gray
+    text: '#F8FAFC', // Crisp soft white to prevent glare/halo effect
+    background: '#18181B', // Deep zinc charcoal background instead of harsh black
+    backgroundElement: '#27272A', // Elevated warm zinc container
+    backgroundSelected: '#3F3F46',
+    textSecondary: '#CBD5E1', // High contrast soft slate silver (11.2:1)
 
-    primaryAction: '#3B82F6', // High visibility blue
+    primaryAction: '#3B82F6', // High visibility vibrant blue
     primaryActionText: '#FFFFFF',
-    surfaceCard: '#292524',
-    surfaceElevated: '#3E3A36',
+    surfaceCard: '#27272A',
+    surfaceElevated: '#3F3F46',
+    cardBorder: '#3F3F46',
 
     riskSafe: '#4ADE80',
     riskCaution: '#FBBF24',
     riskHigh: '#F87171',
-    riskInsufficient: '#A8A29E',
+    riskInsufficient: '#94A3B8',
+
+    riskSafeBg: '#143821',
+    riskCautionBg: '#382A0C',
+    riskHighBg: '#3B1E1E',
+    riskInsufficientBg: '#334155',
   },
 } as const;
 

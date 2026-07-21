@@ -1,14 +1,21 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Accessibility } from '@/theme/tokens';
+import { useTheme } from '@/hooks/use-theme';
 
 export default function TabLayout() {
+  const theme = useTheme();
   return (
     <Tabs screenOptions={{
-      tabBarActiveTintColor: Accessibility.colors.primaryAction,
-      tabBarInactiveTintColor: Accessibility.colors.calmTextSecondary,
-      tabBarLabelStyle: { fontSize: 14, fontWeight: 'bold' },
-      tabBarStyle: { height: 70, paddingBottom: 10, paddingTop: 10 },
+      tabBarActiveTintColor: theme.primaryAction,
+      tabBarInactiveTintColor: theme.textSecondary,
+      tabBarLabelStyle: { fontSize: 13, fontWeight: 'bold' },
+      tabBarStyle: {
+        height: 70,
+        paddingBottom: 10,
+        paddingTop: 10,
+        backgroundColor: theme.surfaceCard,
+        borderTopColor: theme.cardBorder,
+      },
     }}>
       <Tabs.Screen 
         name="index" 

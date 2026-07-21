@@ -33,6 +33,35 @@ export const RiskLevels = {
 
 export type RiskLevelKey = keyof typeof RiskLevels;
 
-export function riskMeta(level: RiskLevel) {
-  return RiskLevels[level] ?? RiskLevels.insufficient_data;
+export function riskMeta(level: RiskLevel, theme: any) {
+  switch (level) {
+    case 'high_risk':
+      return {
+        labelKey: 'companion.result.highRisk',
+        color: theme.riskHigh,
+        background: theme.riskHighBg || '#FEF2F2',
+        icon: 'alert-circle' as const,
+      };
+    case 'caution':
+      return {
+        labelKey: 'companion.result.caution',
+        color: theme.riskCaution,
+        background: theme.riskCautionBg || '#FFFBEB',
+        icon: 'warning' as const,
+      };
+    case 'safe':
+      return {
+        labelKey: 'companion.result.safe',
+        color: theme.riskSafe,
+        background: theme.riskSafeBg || '#F0FDF4',
+        icon: 'shield-checkmark' as const,
+      };
+    default:
+      return {
+        labelKey: 'companion.result.insufficientData',
+        color: theme.riskInsufficient,
+        background: theme.riskInsufficientBg || '#F1F5F9',
+        icon: 'help-circle' as const,
+      };
+  }
 }

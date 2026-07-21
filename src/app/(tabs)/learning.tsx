@@ -8,6 +8,7 @@ import { ThemedView } from '@/components/themed-view';
 import { t } from '@/i18n';
 import { Accessibility } from '@/theme/tokens';
 import { MaxContentWidth, Spacing } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
 
 const MOCK_LESSONS = [
   {
@@ -27,6 +28,7 @@ const MOCK_LESSONS = [
 ];
 
 export default function LearningScreen() {
+  const theme = useTheme();
   const [completedLessons, setCompletedLessons] = useState<number[]>([]);
 
   const handleQuiz = (lessonId: number, optionIndex: number, correctIndex: number) => {
@@ -50,28 +52,28 @@ export default function LearningScreen() {
             {MOCK_LESSONS.map(lesson => (
               <ThemedView key={lesson.id} type="backgroundElement" style={styles.lessonCard}>
                 <View style={styles.lessonHeader}>
-                  <Ionicons name="book" size={28} color={Accessibility.colors.primaryAction} />
+                  <Ionicons name="book" size={28} color={theme.primaryAction} />
                   <ThemedText style={styles.lessonTitle}>{lesson.title}</ThemedText>
                   {completedLessons.includes(lesson.id) && (
-                    <Ionicons name="checkmark-circle" size={28} color={Accessibility.colors.riskSafe} />
+                    <Ionicons name="checkmark-circle" size={28} color={theme.riskSafe} />
                   )}
                 </View>
 
                 <View style={styles.points}>
                   {lesson.points.map((p, i) => (
                     <View key={i} style={styles.pointRow}>
-                      <ThemedText style={styles.bullet}>•</ThemedText>
+                      <ThemedText style={[styles.bullet, { color: theme.primaryAction }]}>•</ThemedText>
                       <ThemedText style={styles.pointText}>{p}</ThemedText>
                     </View>
                   ))}
                 </View>
 
-                <View style={styles.quiz}>
+                <View style={[styles.quiz, { borderTopColor: theme.cardBorder }]}>
                   <ThemedText style={styles.quizQuestion}>{lesson.quiz.question}</ThemedText>
                   {lesson.quiz.options.map((opt, idx) => (
                     <Pressable
                       key={idx}
-                      style={styles.optionBtn}
+                      style={[styles.optionBtn, { backgroundColor: theme.surfaceCard, borderColor: theme.primaryAction }]}
                       onPress={() => handleQuiz(lesson.id, idx, lesson.quiz.correctIndex)}>
                       <ThemedText style={styles.optionText}>{opt}</ThemedText>
                     </Pressable>
@@ -104,14 +106,12 @@ const styles = StyleSheet.create({
   lessonTitle: { flex: 1, fontSize: Accessibility.fontSize.large, fontWeight: '700' },
   points: { gap: Spacing.one },
   pointRow: { flexDirection: 'row', gap: Spacing.two, alignItems: 'flex-start' },
-  bullet: { fontSize: Accessibility.fontSize.normal, color: Accessibility.colors.primaryAction },
-  pointText: { flex: 1, fontSize: Accessibility.fontSize.normal, color: Accessibility.colors.calmText },
-  quiz: { marginTop: Spacing.two, gap: Spacing.two, borderTopWidth: 1, borderTopColor: '#EEE', paddingTop: Spacing.three },
+  bullet: { fontSize: Accessibility.fontSize.normal },
+  pointText: { flex: 1, fontSize: Accessibility.fontSize.normal, lineHeight: 26 },
+  quiz: { marginTop: Spacing.two, gap: Spacing.two, borderTopWidth: 1, paddingTop: Spacing.three },
   quizQuestion: { fontSize: Accessibility.fontSize.normal, fontWeight: '700', marginBottom: Spacing.one },
   optionBtn: {
-    backgroundColor: Accessibility.colors.surfaceCard,
     borderWidth: 2,
-    borderColor: Accessibility.colors.primaryAction,
     padding: Spacing.three,
     borderRadius: Spacing.three,
   },
