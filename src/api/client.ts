@@ -18,8 +18,15 @@ function getBaseUrl(): string {
   if (typeof process !== 'undefined' && process.env?.EXPO_PUBLIC_API_BASE_URL) {
     return process.env.EXPO_PUBLIC_API_BASE_URL;
   }
-  return '';
+  // Browser client-side fallback (for relative routing behind Nginx reverse proxy)
+  if (typeof window !== 'undefined' && window.location && window.location.origin) {
+    return window.location.origin;
+  }
+  // Deployed public API endpoint fallback
+  return 'https://unesco-api.w9.nu';
 }
+
+
 
 // ── HTTP Client (frontend → backend) ────────────────────────────────────────
 
