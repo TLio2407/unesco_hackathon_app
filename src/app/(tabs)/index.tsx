@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, TextInput, View, Image, Share, Alert } from 'react-native';
+import { useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, TextInput, View, Image, Share } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 

@@ -37,7 +37,7 @@ export default function ScanScreen() {
     try {
       const output = await client.analyze(input);
       setResult({ type, data, output });
-    } catch (e) {
+    } catch {
       setError(t('scan.tryAgain'));
     } finally {
       setLoading(false);
