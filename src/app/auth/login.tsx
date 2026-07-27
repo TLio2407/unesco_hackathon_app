@@ -1,12 +1,11 @@
 import { StyleSheet, TextInput, Pressable, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { Accessibility } from '@/theme/tokens';
 import { t } from '@/i18n';
+import { PageContainer } from '@/components/page-container';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -17,37 +16,31 @@ export default function LoginScreen() {
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safe}>
-        <View style={styles.content}>
-          <ThemedText type="title" style={styles.title}>
-            {t('auth.login.title') || 'Đăng nhập'}
-          </ThemedText>
+    <PageContainer scrollable={false} contentContainerStyle={styles.content}>
+      <ThemedText type="title" style={styles.title}>
+        {t('auth.login.title') || 'Đăng nhập'}
+      </ThemedText>
 
-          <View style={styles.form}>
-            <TextInput
-              style={styles.input}
-              placeholder={t('auth.login.phonePlaceholder') || 'Số điện thoại'}
-              keyboardType="phone-pad"
-            />
-            <Pressable style={styles.button} onPress={handleLogin}>
-              <ThemedText style={styles.buttonText}>
-                {t('auth.login.submit') || 'Tiếp tục'}
-              </ThemedText>
-            </Pressable>
-          </View>
-        </View>
-      </SafeAreaView>
-    </ThemedView>
+      <View style={styles.form}>
+        <TextInput
+          style={styles.input}
+          placeholder={t('auth.login.phonePlaceholder') || 'Số điện thoại'}
+          keyboardType="phone-pad"
+        />
+        <Pressable style={styles.button} onPress={handleLogin}>
+          <ThemedText style={styles.buttonText}>
+            {t('auth.login.submit') || 'Tiếp tục'}
+          </ThemedText>
+        </Pressable>
+      </View>
+    </PageContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  safe: { flex: 1 },
-  content: { flex: 1, padding: Spacing.four, justifyContent: 'center' },
+  content: { justifyContent: 'center' },
   title: { marginBottom: Spacing.five, textAlign: 'center' },
-  form: { gap: Spacing.three },
+  form: { gap: Spacing.three, width: '100%', maxWidth: 400, alignSelf: 'center' },
   input: {
     height: Accessibility.minTouchSize,
     borderWidth: 1,

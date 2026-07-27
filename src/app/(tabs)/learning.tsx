@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, View, Pressable, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleSheet, View, Pressable, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { t } from '@/i18n';
 import { Accessibility } from '@/theme/tokens';
-import { MaxContentWidth, Spacing } from '@/constants/theme';
+import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { PageContainer } from '@/components/page-container';
 
 const MOCK_LESSONS = [
   {
@@ -41,65 +41,51 @@ export default function LearningScreen() {
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safe}>
-        <ScrollView contentContainerStyle={styles.content}>
-          <ThemedText type="title" style={styles.title}>
-            {t('learning.title')}
-          </ThemedText>
+    <PageContainer>
+      <ThemedText type="title" style={styles.title}>
+        {t('learning.title')}
+      </ThemedText>
 
-          <View style={styles.lessonsList}>
-            {MOCK_LESSONS.map(lesson => (
-              <ThemedView key={lesson.id} type="backgroundElement" style={styles.lessonCard}>
-                <View style={styles.lessonHeader}>
-                  <Ionicons name="book" size={28} color={theme.primaryAction} />
-                  <ThemedText style={styles.lessonTitle}>{lesson.title}</ThemedText>
-                  {completedLessons.includes(lesson.id) && (
-                    <Ionicons name="checkmark-circle" size={28} color={theme.riskSafe} />
-                  )}
-                </View>
+      <View style={styles.lessonsList}>
+        {MOCK_LESSONS.map(lesson => (
+          <ThemedView key={lesson.id} type="backgroundElement" style={styles.lessonCard}>
+            <View style={styles.lessonHeader}>
+              <Ionicons name="book" size={28} color={theme.primaryAction} />
+              <ThemedText style={styles.lessonTitle}>{lesson.title}</ThemedText>
+              {completedLessons.includes(lesson.id) && (
+                <Ionicons name="checkmark-circle" size={28} color={theme.riskSafe} />
+              )}
+            </View>
 
-                <View style={styles.points}>
-                  {lesson.points.map((p, i) => (
-                    <View key={i} style={styles.pointRow}>
-                      <ThemedText style={[styles.bullet, { color: theme.primaryAction }]}>•</ThemedText>
-                      <ThemedText style={styles.pointText}>{p}</ThemedText>
-                    </View>
-                  ))}
+            <View style={styles.points}>
+              {lesson.points.map((p, i) => (
+                <View key={i} style={styles.pointRow}>
+                  <ThemedText style={[styles.bullet, { color: theme.primaryAction }]}>•</ThemedText>
+                  <ThemedText style={styles.pointText}>{p}</ThemedText>
                 </View>
+              ))}
+            </View>
 
-                <View style={[styles.quiz, { borderTopColor: theme.cardBorder }]}>
-                  <ThemedText style={styles.quizQuestion}>{lesson.quiz.question}</ThemedText>
-                  {lesson.quiz.options.map((opt, idx) => (
-                    <Pressable
-                      key={idx}
-                      style={[styles.optionBtn, { backgroundColor: theme.surfaceCard, borderColor: theme.primaryAction }]}
-                      onPress={() => handleQuiz(lesson.id, idx, lesson.quiz.correctIndex)}>
-                      <ThemedText style={styles.optionText}>{opt}</ThemedText>
-                    </Pressable>
-                  ))}
-                </View>
-              </ThemedView>
-            ))}
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </ThemedView>
+            <View style={[styles.quiz, { borderTopColor: theme.cardBorder }]}>
+              <ThemedText style={styles.quizQuestion}>{lesson.quiz.question}</ThemedText>
+              {lesson.quiz.options.map((opt, idx) => (
+                <Pressable
+                  key={idx}
+                  style={[styles.optionBtn, { backgroundColor: theme.surfaceCard, borderColor: theme.primaryAction }]}
+                  onPress={() => handleQuiz(lesson.id, idx, lesson.quiz.correctIndex)}>
+                  <ThemedText style={styles.optionText}>{opt}</ThemedText>
+                </Pressable>
+              ))}
+            </View>
+          </ThemedView>
+        ))}
+      </View>
+    </PageContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  safe: { flex: 1 },
-  content: {
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.four,
-    gap: Spacing.four,
-    maxWidth: MaxContentWidth,
-    alignSelf: 'center',
-    width: '100%',
-  },
-  title: { fontSize: Accessibility.fontSize.title },
+  title: { fontSize: Accessibility.fontSize.title, marginBottom: Spacing.two },
   lessonsList: { gap: Spacing.four },
   lessonCard: { padding: Spacing.four, borderRadius: Spacing.four, gap: Spacing.three },
   lessonHeader: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },

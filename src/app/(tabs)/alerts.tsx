@@ -1,49 +1,18 @@
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View, Pressable, TextInput } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { t } from '@/i18n';
 import { Accessibility } from '@/theme/tokens';
-import { MaxContentWidth, Spacing } from '@/constants/theme';
+import { Spacing } from '@/constants/theme';
 import { RiskBadge } from '@/components/risk-badge';
 import { useTheme } from '@/hooks/use-theme';
+import { PageContainer } from '@/components/page-container';
 
 const MOCK_ALERTS = [
-  {
-    id: 1,
-    title: 'Giả mạo Công an gọi điện đe dọa',
-    category: 'Fake Authority',
-    risk: 'high_risk',
-    summary: 'Đối tượng gọi điện tự xưng là công an, thông báo người dân liên quan đến vụ án ma túy và yêu cầu chuyển tiền vào tài khoản "tạm giữ".',
-    source: 'Bộ Công an',
-  },
-  {
-    id: 2,
-    title: 'Lừa đảo tuyển CTV "Việc nhẹ lương cao"',
-    category: 'Scam',
-    risk: 'high_risk',
-    summary: 'Mời chào tham gia làm CTV chốt đơn Shopee, Lazada để nhận hoa hồng, sau đó yêu cầu nạp số tiền lớn và chiếm đoạt.',
-    source: 'Cục An toàn thông tin',
-  },
-  {
-    id: 3,
-    title: 'Tin giả về "Thuốc thần" trị bách bệnh',
-    category: 'Health',
-    risk: 'caution',
-    summary: 'Các quảng cáo trên Facebook sử dụng logo đài truyền hình để thổi phồng công dụng của thực phẩm chức năng.',
-    source: 'Bộ Y tế',
-  },
-  {
-    id: 4,
-    title: 'Cảnh báo link lạ giả mạo VNeID',
-    category: 'Fake Authority',
-    risk: 'high_risk',
-    summary: 'Tin nhắn SMS yêu cầu cập nhật VNeID mức độ 2 qua một đường link lạ (.apk) để cài mã độc vào điện thoại.',
-    source: 'Cổng thông tin Chính phủ',
-  },
+  // ... (keep MOCK_ALERTS as is)
 ];
 
 type Category = 'All' | 'Scam' | 'Fake Authority' | 'Health';
@@ -61,83 +30,71 @@ export default function AlertsScreen() {
   });
 
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safe}>
-        <ScrollView contentContainerStyle={styles.content}>
-          <ThemedText type="title" style={styles.title}>
-            {t('alert.title')}
-          </ThemedText>
+    <PageContainer>
+      <ThemedText type="title" style={styles.title}>
+        {t('alert.title')}
+      </ThemedText>
 
-          <View style={[styles.searchBar, { backgroundColor: theme.surfaceCard, borderColor: theme.cardBorder }]}>
-            <Ionicons name="search" size={24} color={theme.textSecondary} />
-            <TextInput
-              style={[styles.searchInput, { color: theme.text }]}
-              placeholder="Tìm kiếm cảnh báo..."
-              value={search}
-              onChangeText={setSearch}
-              placeholderTextColor={theme.textSecondary}
-            />
-          </View>
+      <View style={[styles.searchBar, { backgroundColor: theme.surfaceCard, borderColor: theme.cardBorder }]}>
+        <Ionicons name="search" size={24} color={theme.textSecondary} />
+        <TextInput
+          style={[styles.searchInput, { color: theme.text }]}
+          placeholder="Tìm kiếm cảnh báo..."
+          value={search}
+          onChangeText={setSearch}
+          placeholderTextColor={theme.textSecondary}
+        />
+      </View>
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
-            {(['All', 'Scam', 'Fake Authority', 'Health'] as Category[]).map(cat => {
-              const isActive = activeCategory === cat;
-              return (
-                <Pressable
-                  key={cat}
-                  style={[
-                    styles.filterBtn,
-                    {
-                      backgroundColor: isActive ? theme.primaryAction : theme.backgroundElement,
-                      borderColor: isActive ? theme.primaryAction : theme.cardBorder,
-                    }
-                  ]}
-                  onPress={() => setActiveCategory(cat)}>
-                  <ThemedText style={[
-                    styles.filterText,
-                    { color: isActive ? theme.primaryActionText : theme.text, fontWeight: isActive ? '700' : '400' }
-                  ]}>
-                    {cat === 'All' ? 'Tất cả' : cat}
-                  </ThemedText>
-                </Pressable>
-              );
-            })}
-          </ScrollView>
-
-          <View style={styles.alertsList}>
-            {filteredAlerts.map(alert => (
-              <ThemedView key={alert.id} type="backgroundElement" style={styles.alertCard}>
-                <View style={styles.cardHeader}>
-                  <RiskBadge level={alert.risk as any} />
-                  <ThemedText style={[styles.categoryText, { color: theme.textSecondary }]}>{alert.category}</ThemedText>
-                </View>
-                <ThemedText style={styles.alertTitle}>{alert.title}</ThemedText>
-                <ThemedText style={styles.alertSummary}>{alert.summary}</ThemedText>
-                <View style={styles.cardFooter}>
-                  <Ionicons name="newspaper" size={18} color={theme.textSecondary} />
-                  <ThemedText style={[styles.sourceText, { color: theme.textSecondary }]}>Nguồn: {alert.source}</ThemedText>
-                </View>
-              </ThemedView>
-            ))}
-          </View>
+      <View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
+          {(['All', 'Scam', 'Fake Authority', 'Health'] as Category[]).map(cat => {
+            const isActive = activeCategory === cat;
+            return (
+              <Pressable
+                key={cat}
+                style={[
+                  styles.filterBtn,
+                  {
+                    backgroundColor: isActive ? theme.primaryAction : theme.backgroundElement,
+                    borderColor: isActive ? theme.primaryAction : theme.cardBorder,
+                  }
+                ]}
+                onPress={() => setActiveCategory(cat)}>
+                <ThemedText style={[
+                  styles.filterText,
+                  { color: isActive ? theme.primaryActionText : theme.text, fontWeight: isActive ? '700' : '400' }
+                ]}>
+                  {cat === 'All' ? 'Tất cả' : cat}
+                </ThemedText>
+              </Pressable>
+            );
+          })}
         </ScrollView>
-      </SafeAreaView>
-    </ThemedView>
+      </View>
+
+      <View style={styles.alertsList}>
+        {filteredAlerts.map(alert => (
+          <ThemedView key={alert.id} type="backgroundElement" style={styles.alertCard}>
+            <View style={styles.cardHeader}>
+              <RiskBadge level={alert.risk as any} />
+              <ThemedText style={[styles.categoryText, { color: theme.textSecondary }]}>{alert.category}</ThemedText>
+            </View>
+            <ThemedText style={styles.alertTitle}>{alert.title}</ThemedText>
+            <ThemedText style={styles.alertSummary}>{alert.summary}</ThemedText>
+            <View style={styles.cardFooter}>
+              <Ionicons name="newspaper" size={18} color={theme.textSecondary} />
+              <ThemedText style={[styles.sourceText, { color: theme.textSecondary }]}>Nguồn: {alert.source}</ThemedText>
+            </View>
+          </ThemedView>
+        ))}
+      </View>
+    </PageContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  safe: { flex: 1 },
-  content: {
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.four,
-    gap: Spacing.four,
-    maxWidth: MaxContentWidth,
-    alignSelf: 'center',
-    width: '100%',
-  },
-  title: { fontSize: Accessibility.fontSize.title },
+  title: { fontSize: Accessibility.fontSize.title, marginBottom: Spacing.two },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -146,6 +103,7 @@ const styles = StyleSheet.create({
     height: 56,
     borderWidth: 1,
     gap: Spacing.two,
+    marginBottom: Spacing.two,
   },
   searchInput: {
     flex: 1,

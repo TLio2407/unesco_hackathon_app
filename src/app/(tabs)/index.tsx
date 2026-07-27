@@ -1,27 +1,27 @@
 import { useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, TextInput, View, Image, Share } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ActivityIndicator, Pressable, StyleSheet, TextInput, View, Image, Share, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { LessonCard } from '@/components/lesson-card';
 import { RedFlagList } from '@/components/red-flag-list';
 import { RiskBadge } from '@/components/risk-badge';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { ImagePickerButton } from '@/components/ImagePicker';
 import { createAnalyzeClient } from '@/api/client';
 import type { AnalyzeOutput, AnalysisInput } from '@/api/contract';
 import { redact } from '@/lib/redact';
 import { t } from '@/i18n';
 import { Accessibility } from '@/theme/tokens';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { PageContainer } from '@/components/page-container';
 
 const client = createAnalyzeClient();
 type Mode = 'text' | 'url' | 'image' | 'voice';
 
 export default function CompanionScreen() {
   const theme = useTheme();
+  const { width } = useWindowDimensions();
   const [mode, setMode] = useState<Mode>('text');
   const [value, setValue] = useState('');
   const [mediaUri, setMediaUri] = useState<string | null>(null);
@@ -29,6 +29,9 @@ export default function CompanionScreen() {
   const [result, setResult] = useState<AnalyzeOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState(false);
+
+  const numColumns = width > 600 ? 4 : 2;
+  const btnWidth = `${(100 / numColumns) - 2}%`;
 
   async function onSubmit() {
     if (loading) return;
@@ -73,111 +76,107 @@ export default function CompanionScreen() {
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safe}>
-        <ScrollView
-          contentContainerStyle={styles.content}
-          keyboardShouldPersistTaps="handled"
-          style={styles.scroll}>
-          <ThemedText type="subtitle" style={styles.title}>
-            {t('companion.title')}
-          </ThemedText>
+    <PageContainer>
+      <ThemedText type="subtitle" style={styles.title}>
+        {t('companion.title')}
+      </ThemedText>
 
-          <View style={styles.modeGrid}>
-            <ModeButton
-              active={mode === 'text'}
-              label={t('companion.sourceText')}
-              icon="text-outline"
-              onPress={() => { setMode('text'); setMediaUri(null); }}
-            />
-            <ModeButton
-              active={mode === 'url'}
-              label={t('companion.sourceUrl')}
-              icon="link-outline"
-              onPress={() => { setMode('url'); setMediaUri(null); }}
-            />
-            <ImagePickerButton
-              disabled={loading}
-              onImageSelected={(uri) => { setMode('image'); setMediaUri(uri); }}
-            />
-            <Pressable
-              style={[styles.modeBtn, { borderColor: theme.primaryAction, backgroundColor: theme.surfaceCard }, isRecording && { backgroundColor: theme.riskHigh, borderColor: theme.riskHigh }]}
-              onPress={handleVoicePress}
-            >
-               <Ionicons
-                 name={isRecording ? "stop-circle" : "mic-outline"}
-                 size={32}
-                 color={isRecording ? "#FFF" : theme.primaryAction}
-               />
-               <ThemedText style={[styles.modeLabel, isRecording && { color: '#FFF' }]}>
-                 {isRecording ? t('companion.recording') : t('companion.sourceVoice')}
-               </ThemedText>
-            </Pressable>
-          </View>
+      <View style={styles.modeGrid}>
+        <ModeButton
+          active={mode === 'text'}
+          label={t('companion.sourceText')}
+          icon="text-outline"
+          width={btnWidth}
+          onPress={() => { setMode('text'); setMediaUri(null); }}
+        />
+        <ModeButton
+          active={mode === 'url'}
+          label={t('companion.sourceUrl')}
+          icon="link-outline"
+          width={btnWidth}
+          onPress={() => { setMode('url'); setMediaUri(null); }}
+        />
+        <ImagePickerButton
+          disabled={loading}
+          style={{ width: btnWidth }}
+          onImageSelected={(uri) => { setMode('image'); setMediaUri(uri); }}
+        />
+        <Pressable
+          style={[styles.modeBtn, { borderColor: theme.primaryAction, backgroundColor: theme.surfaceCard, width: btnWidth }, isRecording && { backgroundColor: theme.riskHigh, borderColor: theme.riskHigh }]}
+          onPress={handleVoicePress}
+        >
+           <Ionicons
+             name={isRecording ? "stop-circle" : "mic-outline"}
+             size={32}
+             color={isRecording ? "#FFF" : theme.primaryAction}
+           />
+           <ThemedText style={[styles.modeLabel, isRecording && { color: '#FFF' }]}>
+             {isRecording ? t('companion.recording') : t('companion.sourceVoice')}
+           </ThemedText>
+        </Pressable>
+      </View>
 
-          {(mode === 'text' || mode === 'url' || (mode === 'voice' && mediaUri)) && (
-            <TextInput
-              style={[styles.input, { borderColor: theme.textSecondary, color: theme.text, backgroundColor: theme.surfaceCard }]}
-              value={value}
-              onChangeText={setValue}
-              placeholder={t('companion.inputPlaceholder')}
-              placeholderTextColor="#9A9A9A"
-              multiline
-              textAlignVertical="top"
-              autoCapitalize="none"
-              keyboardType={mode === 'url' ? 'url' : 'default'}
-            />
+      {(mode === 'text' || mode === 'url' || (mode === 'voice' && mediaUri)) && (
+        <TextInput
+          style={[styles.input, { borderColor: theme.textSecondary, color: theme.text, backgroundColor: theme.surfaceCard }]}
+          value={value}
+          onChangeText={setValue}
+          placeholder={t('companion.inputPlaceholder')}
+          placeholderTextColor="#9A9A9A"
+          multiline
+          textAlignVertical="top"
+          autoCapitalize="none"
+          keyboardType={mode === 'url' ? 'url' : 'default'}
+        />
+      )}
+
+      {mediaUri && mode !== 'voice' && (
+        <View style={[styles.mediaPreview, { backgroundColor: theme.surfaceCard, borderColor: theme.textSecondary }]}>
+          {mode === 'image' && (
+            <Image source={{ uri: mediaUri }} style={styles.previewImage} />
           )}
-
-          {mediaUri && mode !== 'voice' && (
-            <View style={[styles.mediaPreview, { backgroundColor: theme.surfaceCard, borderColor: theme.textSecondary }]}>
-              {mode === 'image' && (
-                <Image source={{ uri: mediaUri }} style={styles.previewImage} />
-              )}
-              <Pressable onPress={() => setMediaUri(null)}>
-                <Ionicons name="close-circle" size={32} color={theme.riskHigh} />
-              </Pressable>
-            </View>
-          )}
-
-          {mode === 'voice' && mediaUri && (
-            <View style={[styles.voiceInfo, { backgroundColor: theme.backgroundElement }]}>
-              <Ionicons name="musical-notes" size={24} color={theme.primaryAction} />
-              <ThemedText style={{ flex: 1 }}>Ghi âm đã chuyển thành văn bản</ThemedText>
-              <Pressable onPress={() => { setMediaUri(null); setValue(''); }}>
-                <Ionicons name="close-circle" size={24} color={theme.riskHigh} />
-              </Pressable>
-            </View>
-          )}
-
-          <Pressable
-            style={({ pressed }) => [styles.submit, { backgroundColor: theme.primaryAction }, pressed && styles.submitPressed]}
-            onPress={onSubmit}
-            disabled={loading || (mode === 'text' || mode === 'url' ? !value.trim() : !mediaUri)}>
-            <ThemedText style={[styles.submitText, { color: theme.primaryActionText }]}>
-              {loading ? t('common.loading') : t('companion.submit')}
-            </ThemedText>
+          <Pressable onPress={() => setMediaUri(null)}>
+            <Ionicons name="close-circle" size={32} color={theme.riskHigh} />
           </Pressable>
+        </View>
+      )}
 
-          {loading && <ActivityIndicator style={styles.loader} size="large" color={theme.primaryAction} />}
-          {error && (
-            <ThemedText style={[styles.body, { color: theme.riskHigh }]}>{error}</ThemedText>
-          )}
+      {mode === 'voice' && mediaUri && (
+        <View style={[styles.voiceInfo, { backgroundColor: theme.backgroundElement }]}>
+          <Ionicons name="musical-notes" size={24} color={theme.primaryAction} />
+          <ThemedText style={{ flex: 1 }}>Ghi âm đã chuyển thành văn bản</ThemedText>
+          <Pressable onPress={() => { setMediaUri(null); setValue(''); }}>
+            <Ionicons name="close-circle" size={24} color={theme.riskHigh} />
+          </Pressable>
+        </View>
+      )}
 
-          {result && <ResultCard result={result} />}
-        </ScrollView>
-      </SafeAreaView>
-    </ThemedView>
+      <Pressable
+        style={({ pressed }) => [styles.submit, { backgroundColor: theme.primaryAction }, pressed && styles.submitPressed]}
+        onPress={onSubmit}
+        disabled={loading || (mode === 'text' || mode === 'url' ? !value.trim() : !mediaUri)}>
+        <ThemedText style={[styles.submitText, { color: theme.primaryActionText }]}>
+          {loading ? t('common.loading') : t('companion.submit')}
+        </ThemedText>
+      </Pressable>
+
+      {loading && <ActivityIndicator style={styles.loader} size="large" color={theme.primaryAction} />}
+      {error && (
+        <ThemedText style={[styles.body, { color: theme.riskHigh }]}>{error}</ThemedText>
+      )}
+
+      {result && <ResultCard result={result} />}
+    </PageContainer>
   );
 }
 
-function ModeButton({ active, label, icon, onPress }: { active: boolean; label: string; icon: any; onPress: () => void }) {
+function ModeButton({ active, label, icon, width, onPress }: { active: boolean; label: string; icon: any; width: any; onPress: () => void }) {
   const theme = useTheme();
   return (
     <Pressable
       style={({ pressed }) => [
         styles.modeBtn,
-        { borderColor: theme.primaryAction, backgroundColor: theme.surfaceCard },
+        { borderColor: theme.primaryAction, backgroundColor: theme.surfaceCard, width },
         active && { backgroundColor: theme.primaryAction },
         pressed && styles.modeBtnPressed,
       ]}
@@ -249,22 +248,9 @@ function Section({ titleKey, items }: { titleKey: string; items: string[] }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  safe: { flex: 1 },
-  scroll: { flex: 1 },
-  content: {
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.four,
-    gap: Spacing.three,
-    maxWidth: MaxContentWidth,
-    alignSelf: 'center',
-    width: '100%',
-    paddingBottom: BottomTabInset + Spacing.five,
-  },
   title: { fontSize: Accessibility.fontSize.title, marginBottom: Spacing.two },
-  modeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
+  modeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two, justifyContent: 'center' },
   modeBtn: {
-    width: '48%',
     minHeight: 100,
     justifyContent: 'center',
     alignItems: 'center',
@@ -283,6 +269,7 @@ const styles = StyleSheet.create({
     padding: Spacing.three,
     fontSize: Accessibility.fontSize.normal,
     textAlignVertical: 'top',
+    marginTop: Spacing.two,
   },
   mediaPreview: {
     flexDirection: 'row',
@@ -291,6 +278,7 @@ const styles = StyleSheet.create({
     padding: Spacing.three,
     borderRadius: Spacing.four,
     borderWidth: 1,
+    marginTop: Spacing.two,
   },
   previewImage: { width: 100, height: 100, borderRadius: Spacing.two },
   voiceInfo: {
@@ -299,6 +287,7 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
     padding: Spacing.three,
     borderRadius: Spacing.two,
+    marginTop: Spacing.two,
   },
   submit: {
     minHeight: Accessibility.minTouchSize,
@@ -323,11 +312,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: Spacing.two,
+    marginTop: Spacing.two,
   },
   shareBtnText: { fontSize: Accessibility.fontSize.normal, fontWeight: '700' },
   disclaimer: {
     fontSize: Accessibility.fontSize.small,
     fontStyle: 'italic',
     lineHeight: 24,
+    marginTop: Spacing.two,
   },
 });

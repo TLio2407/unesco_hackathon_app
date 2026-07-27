@@ -6,10 +6,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { createAnalyzeClient } from '@/api/client';
 import type { AnalysisInput } from '@/api/contract';
 import { t } from '@/i18n';
-import { Accessibility, Colors } from '@/theme/tokens';
-import { Spacing } from '@/constants/theme';
+import { Accessibility } from '@/theme/tokens';
+import { Spacing, MaxContentWidth } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
 
 export default function ScanScreen() {
+  const theme = useTheme();
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -34,7 +36,6 @@ export default function ScanScreen() {
     setScanned(true);
     setLoading(true);
     setError(null);
-    cameraRef.current?.stopRecording();
 
     const client = createAnalyzeClient();
     const input: AnalysisInput = data.startsWith('http')
@@ -53,19 +54,21 @@ export default function ScanScreen() {
 
   if (!permission) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.loadingText}>{t('scan.analyzing')}</Text>
+      <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <Text style={[styles.loadingText, { color: theme.text }]}>{t('scan.analyzing')}</Text>
       </View>
     );
   }
 
   if (!permission.granted) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.errorText}>{t('scan.noPermission')}</Text>
-        <TouchableOpacity style={styles.button} onPress={requestPermission}>
-          <Text style={styles.buttonText}>{t('common.ok')}</Text>
-        </TouchableOpacity>
+      <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <View style={styles.centeredMaxWidth}>
+          <Text style={[styles.errorText, { color: theme.riskHigh }]}>{t('scan.noPermission')}</Text>
+          <TouchableOpacity style={[styles.button, { backgroundColor: theme.primaryAction }]} onPress={requestPermission}>
+            <Text style={[styles.buttonText, { color: theme.primaryActionText }]}>{t('common.ok')}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -82,49 +85,54 @@ export default function ScanScreen() {
       />
       <View style={styles.overlay}>
         <View style={styles.scanFrame}>
-          <Ionicons name="qr-code" size={48} color={Colors.primaryAction} />
-          <Text style={styles.scanHint}>{t('scan.hint')}</Text>
+          <Ionicons name="qr-code" size={48} color={theme.primaryAction} />
+          <Text style={[styles.scanHint, { color: '#FFF' }]}>{t('scan.hint')}</Text>
         </View>
       </View>
 
       {loading && (
         <View style={styles.loadingOverlay}>
-          <Text style={styles.loadingText}>{t('scan.analyzing')}</Text>
+          <Text style={[styles.loadingText, { color: '#FFF' }]}>{t('scan.analyzing')}</Text>
         </View>
       )}
 
       {result && !loading && (
         <View style={styles.resultOverlay}>
-          <Text style={styles.resultTitle}>{t('scan.resultTitle')}</Text>
+          <View style={styles.centeredMaxWidth}>
+            <Text style={[styles.resultTitle, { color: '#FFF' }]}>{t('scan.resultTitle')}</Text>
 
-          <View style={styles.riskBadgeContainer}>
-            <Text
-              style={[
-                styles.riskBadge,
-                result.output.riskLevel === 'high_risk' && styles.riskHigh,
-                result.output.riskLevel === 'caution' && styles.riskCaution,
-                result.output.riskLevel === 'safe' && styles.riskSafe,
-              ]}>
-              {t(`risk.${result.output.riskLevel}`)}
+            <View style={styles.riskBadgeContainer}>
+              <Text
+                style={[
+                  styles.riskBadge,
+                  result.output.riskLevel === 'high_risk' && { backgroundColor: theme.riskHigh },
+                  result.output.riskLevel === 'caution' && { backgroundColor: theme.riskCaution },
+                  result.output.riskLevel === 'safe' && { backgroundColor: theme.riskSafe },
+                  { color: '#FFF' }
+                ]}>
+                {t(`risk.${result.output.riskLevel}`)}
+              </Text>
+            </View>
+
+            <Text style={[styles.resultDetail, { color: '#DDD' }]}>
+              Dữ liệu: {result.data.substring(0, 50)}...
             </Text>
+
+            <TouchableOpacity style={[styles.button, { backgroundColor: theme.primaryAction }]} onPress={() => { setScanned(false); setResult(null); }}>
+              <Text style={[styles.buttonText, { color: theme.primaryActionText }]}>{t('scan.scanAgain')}</Text>
+            </TouchableOpacity>
           </View>
-
-          <Text style={styles.resultDetail}>
-            Dữ liệu: {result.data.substring(0, 50)}...
-          </Text>
-
-          <TouchableOpacity style={styles.button} onPress={() => { setScanned(false); setResult(null); }}>
-            <Text style={styles.buttonText}>{t('scan.scanAgain')}</Text>
-          </TouchableOpacity>
         </View>
       )}
 
       {error && (
         <View style={styles.errorOverlay}>
-          <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={styles.button} onPress={() => { setError(null); setScanned(false); }}>
-            <Text style={styles.buttonText}>{t('scan.tryAgain')}</Text>
-          </TouchableOpacity>
+          <View style={styles.centeredMaxWidth}>
+            <Text style={[styles.errorText, { color: theme.riskHigh }]}>{error}</Text>
+            <TouchableOpacity style={[styles.button, { backgroundColor: theme.primaryAction }]} onPress={() => { setError(null); setScanned(false); }}>
+              <Text style={[styles.buttonText, { color: theme.primaryActionText }]}>{t('scan.tryAgain')}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       )}
     </View>
@@ -133,6 +141,12 @@ export default function ScanScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  centeredMaxWidth: {
+    maxWidth: MaxContentWidth,
+    width: '100%',
+    alignItems: 'center',
+    padding: Spacing.four,
+  },
   overlay: {
     flex: 1,
     justifyContent: 'center',
@@ -145,7 +159,6 @@ const styles = StyleSheet.create({
   },
   scanHint: {
     fontSize: Accessibility.fontSize.normal,
-    color: Colors.primaryActionText,
     textAlign: 'center',
   },
   loadingOverlay: {
@@ -158,7 +171,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  loadingText: { color: Colors.primaryActionText },
+  loadingText: { fontSize: Accessibility.fontSize.large },
   resultOverlay: {
     position: 'absolute',
     top: 0,
@@ -168,12 +181,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.85)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: Spacing.four,
   },
   resultTitle: {
-    color: Colors.primaryActionText,
     marginBottom: Spacing.three,
     textAlign: 'center',
+    fontSize: Accessibility.fontSize.xlarge,
+    fontWeight: '700',
   },
   riskBadgeContainer: { marginBottom: Spacing.three },
   riskBadge: {
@@ -183,13 +196,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: Accessibility.fontSize.large,
   },
-  riskHigh: { backgroundColor: Colors.riskHigh, color: '#FFFFFF' },
-  riskCaution: { backgroundColor: Colors.riskCaution, color: '#FFFFFF' },
-  riskSafe: { backgroundColor: Colors.riskSafe, color: '#FFFFFF' },
   resultDetail: {
-    color: Colors.calmTextSecondary,
     marginBottom: Spacing.four,
     textAlign: 'center',
+    fontSize: Accessibility.fontSize.normal,
   },
   errorOverlay: {
     position: 'absolute',
@@ -200,22 +210,20 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.85)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: Spacing.four,
   },
   errorText: {
-    color: Colors.riskHigh,
     marginBottom: Spacing.three,
     textAlign: 'center',
+    fontSize: Accessibility.fontSize.large,
+    fontWeight: '700',
   },
   button: {
-    backgroundColor: Colors.primaryAction,
     paddingHorizontal: Spacing.five,
     paddingVertical: Spacing.three,
     borderRadius: Spacing.three,
     minWidth: 160,
   },
   buttonText: {
-    color: Colors.primaryActionText,
     fontSize: Accessibility.fontSize.large,
     fontWeight: '700',
     textAlign: 'center',

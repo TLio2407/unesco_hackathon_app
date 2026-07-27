@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleProp, StyleSheet, ViewStyle } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -11,9 +11,10 @@ import { t } from '@/i18n';
 interface ImagePickerProps {
   onImageSelected: (uri: string) => void;
   disabled?: boolean;
+  style?: StyleProp<ViewStyle>;
 }
 
-export function ImagePickerButton({ onImageSelected, disabled }: ImagePickerProps) {
+export function ImagePickerButton({ onImageSelected, disabled, style }: ImagePickerProps) {
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -30,6 +31,7 @@ export function ImagePickerButton({ onImageSelected, disabled }: ImagePickerProp
     <Pressable
       style={({ pressed }) => [
         styles.button,
+        style,
         pressed && styles.pressed,
         disabled && styles.disabled,
       ]}
@@ -43,7 +45,6 @@ export function ImagePickerButton({ onImageSelected, disabled }: ImagePickerProp
 
 const styles = StyleSheet.create({
   button: {
-    flex: 1,
     minHeight: Accessibility.minTouchSize,
     justifyContent: 'center',
     alignItems: 'center',

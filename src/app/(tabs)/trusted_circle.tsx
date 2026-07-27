@@ -1,16 +1,15 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, ScrollView, View, Modal, TextInput, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Pressable, StyleSheet, View, Modal, TextInput, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { t } from '@/i18n';
 import { Accessibility } from '@/theme/tokens';
-import { MaxContentWidth, Spacing } from '@/constants/theme';
+import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { PageContainer } from '@/components/page-container';
 
-// Mock trusted contacts - updated to include phone numbers per request
 const MOCK_CONTACTS = [
   { id: '1', name: 'Con trai (Minh)', phone: '0901234567' },
   { id: '2', name: 'Cháu gái (Linh)', phone: '0987654321' },
@@ -57,55 +56,51 @@ export default function CircleScreen() {
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safe}>
-        <ScrollView contentContainerStyle={styles.content}>
-          <ThemedText type="title" style={styles.title}>
-            {t('circle.title')}
-          </ThemedText>
+    <PageContainer>
+      <ThemedText type="title" style={styles.title}>
+        {t('circle.title')}
+      </ThemedText>
 
-          <ThemedText style={styles.body}>
-            {t('circle.placeholder')}
-          </ThemedText>
+      <ThemedText style={styles.body}>
+        {t('circle.placeholder')}
+      </ThemedText>
 
-          <View style={styles.contactsList}>
-            {contacts.map(contact => (
-              <ThemedView key={contact.id} type="backgroundElement" style={styles.contactCard}>
-                <View style={styles.contactInfo}>
-                  <Ionicons name="person-circle" size={48} color={theme.primaryAction} />
-                  <View>
-                    <ThemedText style={styles.contactName}>{contact.name}</ThemedText>
-                    <ThemedText style={[styles.contactPhone, { color: theme.textSecondary }]}>{contact.phone}</ThemedText>
-                  </View>
-                </View>
-                <View style={styles.cardActions}>
-                  <Pressable style={[styles.actionBtn, { backgroundColor: theme.primaryAction }]}>
-                    <Ionicons name="chatbubble-ellipses" size={24} color={theme.primaryActionText} />
-                  </Pressable>
-                  <Pressable
-                    style={[styles.actionBtn, { backgroundColor: theme.riskHigh }]}
-                    onPress={() => handleDelete(contact.id)}
-                  >
-                    <Ionicons name="trash" size={24} color="#FFF" />
-                  </Pressable>
-                </View>
-              </ThemedView>
-            ))}
-          </View>
+      <View style={styles.contactsList}>
+        {contacts.map(contact => (
+          <ThemedView key={contact.id} type="backgroundElement" style={styles.contactCard}>
+            <View style={styles.contactInfo}>
+              <Ionicons name="person-circle" size={48} color={theme.primaryAction} />
+              <View>
+                <ThemedText style={styles.contactName}>{contact.name}</ThemedText>
+                <ThemedText style={[styles.contactPhone, { color: theme.textSecondary }]}>{contact.phone}</ThemedText>
+              </View>
+            </View>
+            <View style={styles.cardActions}>
+              <Pressable style={[styles.actionBtn, { backgroundColor: theme.primaryAction }]}>
+                <Ionicons name="chatbubble-ellipses" size={24} color={theme.primaryActionText} />
+              </Pressable>
+              <Pressable
+                style={[styles.actionBtn, { backgroundColor: theme.riskHigh }]}
+                onPress={() => handleDelete(contact.id)}
+              >
+                <Ionicons name="trash" size={24} color="#FFF" />
+              </Pressable>
+            </View>
+          </ThemedView>
+        ))}
+      </View>
 
-          <Pressable style={[styles.addBtn, { backgroundColor: theme.primaryAction }]} onPress={() => setIsModalVisible(true)}>
-            <Ionicons name="add-circle" size={28} color={theme.primaryActionText} />
-            <ThemedText style={[styles.addBtnText, { color: theme.primaryActionText }]}>{t('circle.addContact')}</ThemedText>
-          </Pressable>
+      <Pressable style={[styles.addBtn, { backgroundColor: theme.primaryAction }]} onPress={() => setIsModalVisible(true)}>
+        <Ionicons name="add-circle" size={28} color={theme.primaryActionText} />
+        <ThemedText style={[styles.addBtnText, { color: theme.primaryActionText }]}>{t('circle.addContact')}</ThemedText>
+      </Pressable>
 
-          <View style={[styles.privacyNote, { backgroundColor: theme.riskSafeBg, borderColor: theme.riskSafe }]}>
-            <Ionicons name="shield-checkmark" size={24} color={theme.riskSafe} />
-            <ThemedText style={[styles.privacyText, { color: theme.textSecondary }]}>
-              {t('circle.redactedNotice')}
-            </ThemedText>
-          </View>
-        </ScrollView>
-      </SafeAreaView>
+      <View style={[styles.privacyNote, { backgroundColor: theme.riskSafeBg, borderColor: theme.riskSafe }]}>
+        <Ionicons name="shield-checkmark" size={24} color={theme.riskSafe} />
+        <ThemedText style={[styles.privacyText, { color: theme.textSecondary }]}>
+          {t('circle.redactedNotice')}
+        </ThemedText>
+      </View>
 
       <Modal
         visible={isModalVisible}
@@ -157,27 +152,17 @@ export default function CircleScreen() {
           </ThemedView>
         </View>
       </Modal>
-    </ThemedView>
+    </PageContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  safe: { flex: 1 },
-  content: {
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.four,
-    gap: Spacing.four,
-    maxWidth: MaxContentWidth,
-    alignSelf: 'center',
-    width: '100%',
-  },
-  title: { fontSize: Accessibility.fontSize.title },
+  title: { fontSize: Accessibility.fontSize.title, marginBottom: Spacing.two },
   body: {
     fontSize: Accessibility.fontSize.normal,
     lineHeight: 28,
   },
-  contactsList: { gap: Spacing.three },
+  contactsList: { gap: Spacing.three, marginTop: Spacing.two },
   contactCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -205,6 +190,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.two,
     minHeight: Accessibility.minTouchSize,
+    marginTop: Spacing.two,
   },
   addBtnText: { fontSize: Accessibility.fontSize.large, fontWeight: '700' },
   privacyNote: {
@@ -214,6 +200,7 @@ const styles = StyleSheet.create({
     padding: Spacing.three,
     borderRadius: Spacing.four,
     borderWidth: 1,
+    marginTop: Spacing.two,
   },
   privacyText: { flex: 1, fontSize: Accessibility.fontSize.small },
   modalOverlay: {

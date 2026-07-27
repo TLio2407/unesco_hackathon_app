@@ -1,13 +1,13 @@
-import { ScrollView, StyleSheet, View, Pressable } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleSheet, View, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { t } from '@/i18n';
 import { Accessibility } from '@/theme/tokens';
-import { MaxContentWidth, Spacing } from '@/constants/theme';
+import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { PageContainer } from '@/components/page-container';
 
 const MOCK_EVENTS = [
   {
@@ -36,80 +36,66 @@ export default function CommunityScreen() {
   const theme = useTheme();
 
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safe}>
-        <ScrollView contentContainerStyle={styles.content}>
-          <ThemedText type="title" style={styles.title}>
-            {t('community.title')}
-          </ThemedText>
+    <PageContainer>
+      <ThemedText type="title" style={styles.title}>
+        {t('community.title')}
+      </ThemedText>
 
-          <ThemedText style={styles.body}>
-            {t('community.placeholder')}
-          </ThemedText>
+      <ThemedText style={styles.body}>
+        {t('community.placeholder')}
+      </ThemedText>
 
-          <View style={styles.section}>
-            <ThemedText type="subtitle" style={styles.sectionTitle}>Sự kiện sắp tới</ThemedText>
-            {MOCK_EVENTS.map(event => (
-              <ThemedView key={event.id} type="backgroundElement" style={styles.eventCard}>
-                <View style={styles.eventHeader}>
-                  <View style={[styles.typeBadge, { backgroundColor: theme.surfaceElevated, borderColor: theme.primaryAction }]}>
-                    <ThemedText style={[styles.typeText, { color: theme.primaryAction }]}>{event.type}</ThemedText>
-                  </View>
-                  <ThemedText style={[styles.eventDate, { color: theme.textSecondary }]}>{event.date}</ThemedText>
-                </View>
-                <ThemedText style={styles.eventTitle}>{event.title}</ThemedText>
-                <View style={styles.locationRow}>
-                  <Ionicons name="location" size={20} color={theme.textSecondary} />
-                  <ThemedText style={[styles.locationText, { color: theme.textSecondary }]}>{event.location}</ThemedText>
-                </View>
-                <Pressable style={[styles.joinBtn, { backgroundColor: theme.primaryAction }]}>
-                  <ThemedText style={[styles.joinBtnText, { color: theme.primaryActionText }]}>Đăng ký tham gia</ThemedText>
-                </Pressable>
-              </ThemedView>
-            ))}
-          </View>
-
-          <View style={styles.section}>
-            <ThemedText type="subtitle" style={styles.sectionTitle}>Đối tác tin cậy</ThemedText>
-            <ThemedView type="backgroundElement" style={styles.partnerMap}>
-              {PARTNERS.map(partner => (
-                <View key={partner.id} style={styles.partnerItem}>
-                  <Ionicons name={partner.icon as any} size={40} color={theme.primaryAction} />
-                  <ThemedText style={styles.partnerName}>{partner.name}</ThemedText>
-                </View>
-              ))}
-              <View style={styles.mapHint}>
-                <Ionicons name="map-outline" size={24} color={theme.textSecondary} />
-                <ThemedText style={[styles.mapHintText, { color: theme.textSecondary }]}>Xem bản đồ các điểm hỗ trợ MIL gần cô/chú</ThemedText>
+      <View style={styles.section}>
+        <ThemedText type="subtitle" style={styles.sectionTitle}>Sự kiện sắp tới</ThemedText>
+        {MOCK_EVENTS.map(event => (
+          <ThemedView key={event.id} type="backgroundElement" style={styles.eventCard}>
+            <View style={styles.eventHeader}>
+              <View style={[styles.typeBadge, { backgroundColor: theme.surfaceElevated, borderColor: theme.primaryAction }]}>
+                <ThemedText style={[styles.typeText, { color: theme.primaryAction }]}>{event.type}</ThemedText>
               </View>
-              <Pressable style={[styles.mapBtn, { backgroundColor: theme.surfaceCard, borderColor: theme.primaryAction }]}>
-                 <ThemedText style={[styles.mapBtnText, { color: theme.primaryAction }]}>Mở bản đồ đối tác</ThemedText>
-              </Pressable>
-            </ThemedView>
+              <ThemedText style={[styles.eventDate, { color: theme.textSecondary }]}>{event.date}</ThemedText>
+            </View>
+            <ThemedText style={styles.eventTitle}>{event.title}</ThemedText>
+            <View style={styles.locationRow}>
+              <Ionicons name="location" size={20} color={theme.textSecondary} />
+              <ThemedText style={[styles.locationText, { color: theme.textSecondary }]}>{event.location}</ThemedText>
+            </View>
+            <Pressable style={[styles.joinBtn, { backgroundColor: theme.primaryAction }]}>
+              <ThemedText style={[styles.joinBtnText, { color: theme.primaryActionText }]}>Đăng ký tham gia</ThemedText>
+            </Pressable>
+          </ThemedView>
+        ))}
+      </View>
+
+      <View style={styles.section}>
+        <ThemedText type="subtitle" style={styles.sectionTitle}>Đối tác tin cậy</ThemedText>
+        <ThemedView type="backgroundElement" style={styles.partnerMap}>
+          {PARTNERS.map(partner => (
+            <View key={partner.id} style={styles.partnerItem}>
+              <Ionicons name={partner.icon as any} size={40} color={theme.primaryAction} />
+              <ThemedText style={styles.partnerName}>{partner.name}</ThemedText>
+            </View>
+          ))}
+          <View style={styles.mapHint}>
+            <Ionicons name="map-outline" size={24} color={theme.textSecondary} />
+            <ThemedText style={[styles.mapHintText, { color: theme.textSecondary }]}>Xem bản đồ các điểm hỗ trợ MIL gần cô/chú</ThemedText>
           </View>
-        </ScrollView>
-      </SafeAreaView>
-    </ThemedView>
+          <Pressable style={[styles.mapBtn, { backgroundColor: theme.surfaceCard, borderColor: theme.primaryAction }]}>
+             <ThemedText style={[styles.mapBtnText, { color: theme.primaryAction }]}>Mở bản đồ đối tác</ThemedText>
+          </Pressable>
+        </ThemedView>
+      </View>
+    </PageContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  safe: { flex: 1 },
-  content: {
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.four,
-    gap: Spacing.four,
-    maxWidth: MaxContentWidth,
-    alignSelf: 'center',
-    width: '100%',
-  },
-  title: { fontSize: Accessibility.fontSize.title },
+  title: { fontSize: Accessibility.fontSize.title, marginBottom: Spacing.two },
   body: {
     fontSize: Accessibility.fontSize.normal,
     lineHeight: 28,
   },
-  section: { gap: Spacing.three },
+  section: { gap: Spacing.three, marginTop: Spacing.two },
   sectionTitle: { fontSize: Accessibility.fontSize.large, fontWeight: '700' },
   eventCard: {
     padding: Spacing.three,
