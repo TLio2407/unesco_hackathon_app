@@ -24,10 +24,6 @@ export default function ProfileScreen() {
 
   return (
     <PageContainer>
-      <ThemedText type="title" style={styles.title}>
-        {t('profile.title')}
-      </ThemedText>
-
       {/* User Info Header */}
       <ThemedView type="backgroundElement" style={styles.profileCard}>
         <Ionicons name="person-circle-outline" size={64} color={theme.primaryAction} />

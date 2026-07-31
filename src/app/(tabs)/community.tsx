@@ -37,10 +37,6 @@ export default function CommunityScreen() {
 
   return (
     <PageContainer>
-      <ThemedText type="title" style={styles.title}>
-        {t('community.title')}
-      </ThemedText>
-
       <ThemedText style={styles.body}>
         {t('community.placeholder')}
       </ThemedText>

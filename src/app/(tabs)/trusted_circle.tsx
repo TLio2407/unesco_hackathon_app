@@ -60,10 +60,6 @@ export default function CircleScreen() {
 
   return (
     <PageContainer>
-      <ThemedText type="title" style={styles.title}>
-        {t('circle.title')} (Vòng tròn Người thân)
-      </ThemedText>
-
       <ThemedText style={styles.body}>{t('circle.placeholder')}</ThemedText>
 
       <View style={styles.contactsList}>

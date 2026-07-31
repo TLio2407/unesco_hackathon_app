@@ -61,10 +61,6 @@ export default function AlertsScreen() {
 
   const listPane = (
     <View style={styles.paneContent}>
-      <ThemedText type="title" style={styles.title}>
-        {t('alert.title')} (Cổng Cảnh báo Chính thức)
-      </ThemedText>
-
       <View style={[styles.searchBar, { backgroundColor: theme.surfaceCard, borderColor: theme.cardBorder }]}>
         <Ionicons name="search" size={24} color={theme.textSecondary} />
         <TextInput

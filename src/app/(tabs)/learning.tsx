@@ -63,10 +63,6 @@ export default function LearningScreen() {
 
   const masterPane = (
     <View style={styles.paneContent}>
-      <ThemedText type="title" style={styles.title}>
-        {t('learning.title')} (Lộ trình Khóa học MIL)
-      </ThemedText>
-
       {/* Progress Bar Card */}
       <ThemedView type="backgroundElement" style={styles.progressCard}>
         <View style={styles.progressHeader}>

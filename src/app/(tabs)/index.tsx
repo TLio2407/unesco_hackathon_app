@@ -85,10 +85,6 @@ export default function CompanionScreen() {
 
   const inputPane = (
     <View style={styles.paneContent}>
-      <ThemedText type="subtitle" style={styles.title}>
-        {t('companion.title')}
-      </ThemedText>
-
       <View style={styles.modeGrid}>
         <ModeButton
           active={mode === 'text'}
