@@ -39,11 +39,20 @@ export class ApiAnalyzeClient implements AnalyzeClient {
 
   async analyze(input: AnalysisInput): Promise<AnalyzeOutput> {
     if (!this.baseUrl) return mockAnalyze(input);
-    const res = await fetch(`${this.baseUrl.replace(/\/$/, '')}/api/analyze`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(input),
-    });
+    const targetUrl = `${this.baseUrl.replace(/\/$/, '')}/api/analyze`;
+    let res: Response;
+    try {
+      res = await fetch(targetUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(input),
+      });
+    } catch (err) {
+      console.warn(`[ApiAnalyzeClient] Fetch network error from ${targetUrl}, using local client fallback:`, err);
+      const direct = new DirectAnalyzeClient();
+      return direct.analyze(input);
+    }
+
     if (!res.ok) throw new Error(`analyze request failed: ${res.status}`);
     const raw = await res.json();
     const parsed = safeParseAnalyzeOutput(raw);
