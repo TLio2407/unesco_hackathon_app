@@ -143,16 +143,17 @@ export default function AlertsScreen() {
           <ThemedText style={styles.emptyText}>Không tìm thấy cảnh báo phù hợp.</ThemedText>
         ) : (
           filteredAlerts.map((alert) => (
-            <Pressable
+            <ThemedView
               key={alert.id}
-              onPress={() => setSelectedAlert(alert)}
-              accessibilityRole="button">
-              <ThemedView
-                type="backgroundElement"
-                style={[
-                  styles.alertCard,
-                  selectedAlert?.id === alert.id && { borderColor: theme.primaryAction, borderWidth: 2 },
-                ]}>
+              type="backgroundElement"
+              style={[
+                styles.alertCard,
+                selectedAlert?.id === alert.id && { borderColor: theme.primaryAction, borderWidth: 2 },
+              ]}>
+              <Pressable
+                onPress={() => setSelectedAlert(alert)}
+                accessibilityRole="button"
+                accessibilityLabel={`Xem chi tiết cảnh báo: ${alert.title}`}>
                 <View style={styles.cardHeader}>
                   <RiskBadge level={alert.risk} />
                   <ThemedText style={[styles.categoryText, { color: theme.textSecondary }]}>
@@ -168,19 +169,19 @@ export default function AlertsScreen() {
                     Nguồn: {alert.source} • {alert.publishedAt}
                   </ThemedText>
                 </View>
+              </Pressable>
 
-                <Pressable
-                  style={[styles.dispatchBtn, { backgroundColor: theme.primaryAction }]}
-                  onPress={() => setDispatchModalAlert(alert)}
-                  accessibilityRole="button"
-                  accessibilityLabel="Gửi cảnh báo đến Vòng tròn Người thân">
-                  <Ionicons name="people-outline" size={20} color={theme.primaryActionText} />
-                  <ThemedText style={[styles.dispatchBtnText, { color: theme.primaryActionText }]}>
-                    Cảnh báo cho Người thân
-                  </ThemedText>
-                </Pressable>
-              </ThemedView>
-            </Pressable>
+              <Pressable
+                style={[styles.dispatchBtn, { backgroundColor: theme.primaryAction }]}
+                onPress={() => setDispatchModalAlert(alert)}
+                accessibilityRole="button"
+                accessibilityLabel="Gửi cảnh báo đến Vòng tròn Người thân">
+                <Ionicons name="people-outline" size={20} color={theme.primaryActionText} />
+                <ThemedText style={[styles.dispatchBtnText, { color: theme.primaryActionText }]}>
+                  Cảnh báo cho Người thân
+                </ThemedText>
+              </Pressable>
+            </ThemedView>
           ))
         )}
       </View>
