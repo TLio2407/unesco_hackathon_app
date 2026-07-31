@@ -6,15 +6,19 @@ import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from './themed-text';
 import { Accessibility } from '@/theme/tokens';
 import { Spacing } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
 import { t } from '@/i18n';
 
 interface ImagePickerProps {
   onImageSelected: (uri: string) => void;
   disabled?: boolean;
+  active?: boolean;
   style?: StyleProp<ViewStyle>;
 }
 
-export function ImagePickerButton({ onImageSelected, disabled, style }: ImagePickerProps) {
+export function ImagePickerButton({ onImageSelected, disabled, active, style }: ImagePickerProps) {
+  const theme = useTheme();
+
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -31,27 +35,35 @@ export function ImagePickerButton({ onImageSelected, disabled, style }: ImagePic
     <Pressable
       style={({ pressed }) => [
         styles.button,
+        { borderColor: theme.primaryAction, backgroundColor: theme.surfaceCard },
+        active && { backgroundColor: theme.primaryAction },
         style,
         pressed && styles.pressed,
         disabled && styles.disabled,
       ]}
       onPress={pickImage}
-      disabled={disabled}>
-      <Ionicons name="image" size={32} color={Accessibility.colors.primaryAction} />
-      <ThemedText style={styles.label}>{t('companion.sourceImage')}</ThemedText>
+      disabled={disabled}
+      accessibilityRole="button"
+      accessibilityLabel={t('companion.sourceImage')}>
+      <Ionicons
+        name="image-outline"
+        size={32}
+        color={active ? theme.primaryActionText : theme.primaryAction}
+      />
+      <ThemedText style={[styles.label, active && { color: theme.primaryActionText }]}>
+        {t('companion.sourceImage')}
+      </ThemedText>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   button: {
-    minHeight: Accessibility.minTouchSize,
+    minHeight: 100,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: Spacing.four,
     borderWidth: 2,
-    borderColor: Accessibility.colors.primaryAction,
-    backgroundColor: Accessibility.colors.surfaceCard,
     padding: Spacing.two,
     gap: Spacing.one,
   },
@@ -60,6 +72,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: Accessibility.fontSize.normal,
     fontWeight: '600',
-    color: Accessibility.colors.calmText,
+    textAlign: 'center',
   },
 });

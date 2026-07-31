@@ -104,6 +104,7 @@ export default function CompanionScreen() {
         />
         <ImagePickerButton
           disabled={loading}
+          active={mode === 'image'}
           style={{ width: btnWidth }}
           onImageSelected={(uri) => { setMode('image'); setMediaUri(uri); }}
         />
