@@ -18,15 +18,15 @@ function getBaseUrl(): string {
   if (typeof process !== 'undefined' && process.env?.EXPO_PUBLIC_API_BASE_URL) {
     return process.env.EXPO_PUBLIC_API_BASE_URL;
   }
-  // Browser client-side: relative routing behind Nginx when on production domain
+  // Browser client-side: use window origin ONLY when running directly on production domain
   const win = (globalThis as any).window;
-  if (typeof win !== 'undefined' && win.location && win.location.origin) {
-    const origin = win.location.origin;
-    if (!origin.includes(':8081') && !origin.includes(':19006') && !origin.includes(':8082') && !origin.includes('localhost')) {
-      return origin;
+  if (typeof win !== 'undefined' && win.location && win.location.hostname) {
+    const hostname = win.location.hostname;
+    if (hostname === 'unesco.w9.nu' || hostname.endsWith('.w9.nu')) {
+      return win.location.origin;
     }
   }
-  // Deployed public AI API endpoint fallback
+  // Deployed public AI API endpoint fallback (for Expo Go, Ngrok tunnels, local Metro dev)
   return 'https://unesco.w9.nu';
 }
 
