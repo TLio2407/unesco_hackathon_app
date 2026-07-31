@@ -78,6 +78,37 @@ export const TAXONOMY_MODULES: TaxonomyModule[] = [
   },
 ];
 
+export const TAXONOMY_MODULES_EN: TaxonomyModule[] = [
+  {
+    id: 'banking',
+    title: 'Banking Safety',
+    description: 'Protect bank accounts, OTP codes, and financial transactions',
+    icon: 'card-outline',
+    color: '#1D4ED8',
+  },
+  {
+    id: 'impersonation',
+    title: 'Impersonation Defense',
+    description: 'Detect scam calls and messages pretending to be Police, Banks, or Relatives',
+    icon: 'shield-checkmark-outline',
+    color: '#B91C1C',
+  },
+  {
+    id: 'ecommerce',
+    title: 'Shopping & Job Scams',
+    description: 'Beware of fake online job offers, prize traps, and counterfeit goods',
+    icon: 'basket-outline',
+    color: '#B45309',
+  },
+  {
+    id: 'privacy',
+    title: 'Personal Data Protection',
+    description: 'Keep National ID, passwords, and device privacy secure',
+    icon: 'lock-closed-outline',
+    color: '#15803D',
+  },
+];
+
 export const STRUCTURED_LESSONS: MicroLesson[] = [
   {
     id: 1,
@@ -183,9 +214,119 @@ export const STRUCTURED_LESSONS: MicroLesson[] = [
   },
 ];
 
-export function getLessonsByModule(moduleId: ModuleCategory | 'all'): MicroLesson[] {
-  if (moduleId === 'all') return STRUCTURED_LESSONS;
-  return STRUCTURED_LESSONS.filter((item) => item.moduleId === moduleId);
+export const STRUCTURED_LESSONS_EN: MicroLesson[] = [
+  {
+    id: 1,
+    moduleId: 'banking',
+    title: 'Protecting Bank OTP Codes',
+    summary: 'OTP codes are one-time keys to withdraw money. Never share your OTP with anyone.',
+    points: [
+      'Real banks NEVER ask you to read your OTP code over the phone.',
+      'Do not enter OTP codes into unknown links received via SMS or chat apps.',
+      'If you accidentally share an OTP, call your bank hotline immediately to freeze your card.',
+    ],
+    quiz: {
+      question: 'A caller claiming to be a bank agent asks for your OTP to cancel a pending transaction. What should you do?',
+      options: ['Share the OTP code immediately', 'Refuse to share OTP and hang up', 'Send the OTP via SMS text'],
+      correctIndex: 1,
+      explanation: 'OTP codes are top secret passwords. Banks never ask customers for OTPs.',
+    },
+  },
+  {
+    id: 2,
+    moduleId: 'banking',
+    title: 'Recognizing Fake Payment QR Codes',
+    summary: 'Beware of fake QR codes pasted over official store codes or sent online.',
+    points: [
+      'Always double-check the recipient name on your screen before confirming payment.',
+      'Do not scan random QR codes promising free gifts or instant refunds.',
+      'Inspect physical QR standees at stores for signs of tampering or fake sticker overlays.',
+    ],
+    quiz: {
+      question: 'Before pressing "Send Money" after scanning a QR code, what is the most important step?',
+      options: ['Enter money as fast as possible', 'Verify the recipient name matches on screen', 'Send QR photo to a stranger'],
+      correctIndex: 1,
+      explanation: 'Always verify the recipient account name on your banking app screen before confirming.',
+    },
+  },
+  {
+    id: 3,
+    moduleId: 'impersonation',
+    title: 'Spotting Fake Police Officer Calls',
+    summary: 'Police and law enforcement conduct official business in person, never demanding money by phone.',
+    points: [
+      'Police officers do not work over phone calls or demand money transfers to "escrow" accounts.',
+      'If you receive a threatening call about traffic fines or legal cases, stay calm and hang up.',
+      'Visit your nearest local police station for official verification assistance.',
+    ],
+    quiz: {
+      question: 'A stranger calls claiming you owe $200 in traffic fines and demands an immediate transfer. What should you do?',
+      options: ['Transfer money immediately', 'Hang up immediately and do not transfer money', 'Give them your ID number'],
+      correctIndex: 1,
+      explanation: 'Police do not collect fines over phone calls or ask for personal account transfers.',
+    },
+  },
+  {
+    id: 4,
+    moduleId: 'impersonation',
+    title: 'Beware of Deepfake Relative Voice Scams',
+    summary: 'Scammers can generate fake videos and voices that sound identical to your children or grandchildren to borrow money.',
+    points: [
+      'Call your relative back using their regular cellular phone number to verify directly.',
+      'Ask a personal question that only your real relative would know the answer to.',
+      'Never transfer money immediately based solely on a brief voice message or blurry video call.',
+    ],
+    quiz: {
+      question: 'A video chat from a relative asks for emergency money, but the video is laggy and the voice stutters. What do you do?',
+      options: ['Send money right away', 'Call your relative directly on their mobile phone to ask', 'Borrow money to send'],
+      correctIndex: 1,
+      explanation: 'Always call back directly on their mobile number to avoid AI Deepfake cloning traps.',
+    },
+  },
+  {
+    id: 5,
+    moduleId: 'ecommerce',
+    title: 'Beware of Fake High-Paying Online Job Traps',
+    summary: 'Never deposit money upfront to complete order tasks for commission rewards.',
+    points: [
+      'Job offers promising easy work for hundreds of dollars a day are scam traps.',
+      'Scammers often let you withdraw small rewards first to gain trust, then demand large deposits before blocking you.',
+      'Do not transfer deposit funds for online job opportunities.',
+    ],
+    quiz: {
+      question: 'An advertisement offers $100 commission for depositing $50 to process online orders. What is this?',
+      options: ['A legitimate job', 'An online deposit scam trap', 'A shopping promotion'],
+      correctIndex: 1,
+      explanation: 'Demanding upfront money deposits to earn commission is a classic scam tactic.',
+    },
+  },
+  {
+    id: 6,
+    moduleId: 'privacy',
+    title: 'Protecting National ID Cards and Apps',
+    summary: 'Do not post photos of your National ID online or send them to unknown links.',
+    points: [
+      'ID card photos can be stolen by scammers to register illegal loans or fake bank accounts.',
+      'Download official Digital ID apps only from Google Play Store (Android) or Apple App Store (iPhone).',
+      'Never tap on unknown .APK app installer links sent via SMS or chat apps.',
+    ],
+    quiz: {
+      question: 'You receive an SMS asking you to tap a link to download an .APK file for ID updates. What should you do?',
+      options: ['Tap the link immediately', 'Delete the message and do not click suspicious links', 'Share the link with friends'],
+      correctIndex: 1,
+      explanation: 'Never install .APK files from SMS links. Official apps are only downloaded from official app stores.',
+    },
+  },
+];
+
+export function getTaxonomyModules(lang: string = 'en'): TaxonomyModule[] {
+  return lang === 'en' ? TAXONOMY_MODULES_EN : TAXONOMY_MODULES;
+}
+
+export function getLessonsByModule(moduleId: ModuleCategory | 'all', lang: string = 'en'): MicroLesson[] {
+  const lessons = lang === 'en' ? STRUCTURED_LESSONS_EN : STRUCTURED_LESSONS;
+  if (moduleId === 'all') return lessons;
+  return lessons.filter((item) => item.moduleId === moduleId);
 }
 
 export function calculateProgress(completedIds: number[]): {

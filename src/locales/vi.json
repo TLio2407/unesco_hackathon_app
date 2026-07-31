@@ -10,6 +10,14 @@
     "error": "Có lỗi xảy ra",
     "retry": "Thử lại"
   },
+  "tab": {
+    "companion": "Trợ lý",
+    "alerts": "Cảnh báo",
+    "learning": "Học tập",
+    "circle": "Người thân",
+    "community": "Cộng đồng",
+    "profile": "Cá nhân"
+  },
   "companion": {
     "title": "Trợ lý Quyết định",
     "inputPlaceholder": "Paste văn bản, link hoặc chụp màn hình...",

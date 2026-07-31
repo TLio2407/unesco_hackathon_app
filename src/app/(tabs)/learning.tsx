@@ -15,6 +15,7 @@ import { useResponsive } from '@/hooks/use-responsive';
 import {
   TAXONOMY_MODULES,
   STRUCTURED_LESSONS,
+  getTaxonomyModules,
   getLessonsByModule,
   calculateProgress,
   evaluateBadges,
@@ -23,20 +24,23 @@ import {
   MicroLesson,
   DigitalCertificate,
 } from '@/lib/learning-taxonomy';
+import { useLanguageDialect } from '@/i18n/regional';
 
 type ActiveModule = ModuleCategory | 'all';
 
 export default function LearningScreen() {
   const theme = useTheme();
   const { isWide } = useResponsive();
+  const [dialect] = useLanguageDialect();
 
+  const modules = getTaxonomyModules(dialect);
   const [activeModule, setActiveModule] = useState<ActiveModule>('all');
   const [completedLessons, setCompletedLessons] = useState<number[]>([1]);
-  const [selectedLesson, setSelectedLesson] = useState<MicroLesson>(STRUCTURED_LESSONS[0]);
+  const lessons = getLessonsByModule(activeModule, dialect);
+  const [selectedLesson, setSelectedLesson] = useState<MicroLesson>(lessons[0] || STRUCTURED_LESSONS[0]);
   const [showCertificateModal, setShowCertificateModal] = useState(false);
   const [certificate, setCertificate] = useState<DigitalCertificate | null>(null);
 
-  const lessons = getLessonsByModule(activeModule);
   const { percent, completed, total } = calculateProgress(completedLessons);
   const badges = evaluateBadges(completedLessons);
 
@@ -118,7 +122,7 @@ export default function LearningScreen() {
           </ThemedText>
         </Pressable>
 
-        {TAXONOMY_MODULES.map((mod) => {
+        {modules.map((mod) => {
           const isActive = activeModule === mod.id;
           return (
             <Pressable

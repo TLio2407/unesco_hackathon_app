@@ -72,6 +72,7 @@ export default function TabLayout() {
         name="index" 
         options={{ 
           title: t('companion.title'), 
+          tabBarLabel: t('tab.companion'),
           tabBarIcon: ({ color }) => <Ionicons name="chatbubbles" size={22} color={color} /> 
         }}
       />
@@ -79,6 +80,7 @@ export default function TabLayout() {
         name="alerts"
         options={{
           title: t('alert.title'),
+          tabBarLabel: t('tab.alerts'),
           tabBarIcon: ({ color }) => <Ionicons name="warning" size={22} color={color} />
         }}
       />
@@ -86,6 +88,7 @@ export default function TabLayout() {
         name="learning" 
         options={{ 
           title: t('learning.title'), 
+          tabBarLabel: t('tab.learning'),
           tabBarIcon: ({ color }) => <Ionicons name="book" size={22} color={color} /> 
         }} 
       />
@@ -93,6 +96,7 @@ export default function TabLayout() {
         name="trusted_circle" 
         options={{ 
           title: t('circle.title'), 
+          tabBarLabel: t('tab.circle'),
           tabBarIcon: ({ color }) => <Ionicons name="people" size={22} color={color} /> 
         }} 
       />
@@ -100,6 +104,7 @@ export default function TabLayout() {
         name="community" 
         options={{ 
           title: t('community.title'), 
+          tabBarLabel: t('tab.community'),
           tabBarIcon: ({ color }) => <Ionicons name="megaphone" size={22} color={color} /> 
         }}
       />
@@ -107,6 +112,7 @@ export default function TabLayout() {
         name="profile" 
         options={{ 
           title: t('profile.title'), 
+          tabBarLabel: t('tab.profile'),
           tabBarIcon: ({ color }) => <Ionicons name="person-circle" size={22} color={color} /> 
         }} 
       />

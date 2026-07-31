@@ -87,6 +87,43 @@ export const SIMPLIFIED_GLOSSARY: Record<string, GlossaryTerm> = {
   },
 };
 
+export const SIMPLIFIED_GLOSSARY_EN: Record<string, GlossaryTerm> = {
+  OTP: {
+    term: 'OTP Code',
+    simpleTranslation: '6-digit SMS verification code',
+    analogy: 'Like a one-time key for your house lock; NEVER share it with anyone.',
+  },
+  URL: {
+    term: 'Link / URL',
+    simpleTranslation: 'Website address on the internet',
+    analogy: 'Like a house street address; if the bank name is misspelled, it is a fake site.',
+  },
+  Phishing: {
+    term: 'Phishing Scam',
+    simpleTranslation: 'Tricking you into giving sensitive info',
+    analogy: 'Scammers drop fake bait pretending to be your bank to catch your password.',
+  },
+  Deepfake: {
+    term: 'Deepfake Audio/Video',
+    simpleTranslation: 'AI video/voice cloning technology',
+    analogy: 'Computers copying your relative face and voice to ask for money.',
+  },
+  VNeID: {
+    term: 'Digital ID App',
+    simpleTranslation: 'Official National Identity app',
+    analogy: 'Your national ID card on your smartphone, downloaded only from official App Store.',
+  },
+  'QR Code': {
+    term: 'QR Barcode',
+    simpleTranslation: 'Square barcode scanned by phone camera',
+    analogy: 'Taking a photo of a square pattern to open websites or pay.',
+  },
+};
+
+export function getGlossary(): Record<string, GlossaryTerm> {
+  return currentDialect === 'en' ? SIMPLIFIED_GLOSSARY_EN : SIMPLIFIED_GLOSSARY;
+}
+
 let currentDialect: DialectCode = 'en';
 const dialectListeners = new Set<(dialect: DialectCode) => void>();
 

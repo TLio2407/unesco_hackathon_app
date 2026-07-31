@@ -10,6 +10,14 @@
     "error": "Something went wrong",
     "retry": "Retry"
   },
+  "tab": {
+    "companion": "Assistant",
+    "alerts": "Alerts",
+    "learning": "Lessons",
+    "circle": "Circle",
+    "community": "Community",
+    "profile": "Profile"
+  },
   "companion": {
     "title": "Decision Assistant",
     "inputPlaceholder": "Paste text, link, or screenshot...",

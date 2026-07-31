@@ -2,30 +2,35 @@ import React, { useState } from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from './themed-text';
-import { SIMPLIFIED_GLOSSARY, GlossaryTerm } from '@/i18n/regional';
+import { getGlossary, GlossaryTerm, useLanguageDialect } from '@/i18n/regional';
 import { useTheme } from '@/hooks/use-theme';
 import { Spacing } from '@/constants/theme';
 import { Accessibility } from '@/theme/tokens';
 
 export function SimplifiedGlossary() {
   const [selectedTerm, setSelectedTerm] = useState<GlossaryTerm | null>(null);
+  const [dialect] = useLanguageDialect();
   const theme = useTheme();
+  const isEn = dialect === 'en';
+  const glossary = getGlossary();
 
   return (
     <View style={[styles.container, { backgroundColor: theme.surfaceElevated, borderColor: theme.cardBorder }]}>
       <View style={styles.header}>
         <Ionicons name="help-buoy-outline" size={24} color={theme.primaryAction} />
         <ThemedText style={[styles.title, { color: theme.primaryAction }]}>
-          Từ điển Giải thích Đơn giản (Cho Người cao tuổi)
+          {isEn ? 'Simplified Tech Glossary (Senior Friendly)' : 'Từ điển Giải thích Đơn giản (Cho Người cao tuổi)'}
         </ThemedText>
       </View>
 
       <ThemedText style={styles.subtext}>
-        Bấm vào thuật ngữ để xem giải thích bằng hình ảnh ví dụ đời sống:
+        {isEn
+          ? 'Tap any term to view simple real-life analogies:'
+          : 'Bấm vào thuật ngữ để xem giải thích bằng hình ảnh ví dụ đời sống:'}
       </ThemedText>
 
       <View style={styles.chipGrid}>
-        {Object.values(SIMPLIFIED_GLOSSARY).map((item) => {
+        {Object.values(glossary).map((item) => {
           const isSelected = selectedTerm?.term === item.term;
           return (
             <Pressable
@@ -39,7 +44,7 @@ export function SimplifiedGlossary() {
               ]}
               onPress={() => setSelectedTerm(isSelected ? null : item)}
               accessibilityRole="button"
-              accessibilityLabel={`Thuật ngữ: ${item.term}`}>
+              accessibilityLabel={`Term: ${item.term}`}>
               <ThemedText
                 style={[
                   styles.chipText,
@@ -58,7 +63,7 @@ export function SimplifiedGlossary() {
             {selectedTerm.term} ➔ {selectedTerm.simpleTranslation}
           </ThemedText>
           <ThemedText style={styles.analogyText}>
-            💡 Ví dụ dễ hiểu: {selectedTerm.analogy}
+            💡 {isEn ? 'Simple Analogy:' : 'Ví dụ dễ hiểu:'} {selectedTerm.analogy}
           </ThemedText>
         </View>
       )}

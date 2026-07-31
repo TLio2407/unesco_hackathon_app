@@ -9,6 +9,7 @@ import { Accessibility } from '@/theme/tokens';
 import { Spacing } from '@/constants/theme';
 import { RiskBadge } from '@/components/risk-badge';
 import { useTheme } from '@/hooks/use-theme';
+import { useLanguageDialect } from '@/i18n/regional';
 import { PageContainer } from '@/components/page-container';
 import { AudioReadback } from '@/components/audio-readback';
 import { DualPane } from '@/components/dual-pane';
@@ -39,10 +40,12 @@ export default function AlertsScreen() {
   const [customDispatchNote, setCustomDispatchNote] = useState('');
   const [dispatchSuccess, setDispatchSuccess] = useState(false);
 
-  const filteredAlerts = filterThreatAlerts(OFFICIAL_THREAT_FEEDS, {
+  const [dialect] = useLanguageDialect();
+  const filteredAlerts = filterThreatAlerts(undefined, {
     source: activeSource,
     category: activeCategory,
     search,
+    lang: dialect,
   });
 
   const handleDispatchSubmit = () => {

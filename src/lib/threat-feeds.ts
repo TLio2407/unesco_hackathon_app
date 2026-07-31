@@ -97,24 +97,92 @@ export const OFFICIAL_THREAT_FEEDS: ThreatAlert[] = [
   },
 ];
 
+export const OFFICIAL_THREAT_FEEDS_EN: ThreatAlert[] = [
+  {
+    id: 'feed-1',
+    title: 'Fake Law Enforcement Scam Calls Demanding Traffic Fines',
+    category: 'Fake Authority',
+    risk: 'high_risk',
+    summary: 'Scammers impersonate police officers, claiming citizens are involved in illegal cases or traffic fines, demanding funds transferred to "escrow" accounts.',
+    source: 'Bộ Công an',
+    sourceUrl: 'https://bocongan.gov.vn',
+    publishedAt: '2026-07-30',
+    verifiedBy: 'National Cyber Security Center (NCSC)',
+    affectedDemographic: 'Senior Citizens (55+)',
+  },
+  {
+    id: 'feed-2',
+    title: 'Fake High-Paying E-Commerce Job Commission Scam',
+    category: 'Scam',
+    risk: 'high_risk',
+    summary: 'Invitations to work as online ordering agents with high commissions, demanding large upfront deposits that scammers steal.',
+    source: 'Cục An toàn thông tin',
+    sourceUrl: 'https://khonggianmang.vn',
+    publishedAt: '2026-07-28',
+    verifiedBy: 'Authority of Information Security',
+    affectedDemographic: 'Retirees & Homemakers',
+  },
+  {
+    id: 'feed-3',
+    title: 'Fake Health Miracle Cure Advertisements Target Elderly',
+    category: 'Health',
+    risk: 'caution',
+    summary: 'Ads on social media use deepfake videos of TV doctors to exaggerate functional food benefits.',
+    source: 'Bộ Công an',
+    sourceUrl: 'https://moh.gov.vn',
+    publishedAt: '2026-07-25',
+    verifiedBy: 'Ministry of Health & NCSC',
+    affectedDemographic: 'Senior Citizens',
+  },
+  {
+    id: 'feed-4',
+    title: 'Phishing SMS Demanding Digital ID Updates via Fake Links',
+    category: 'Fake Authority',
+    risk: 'high_risk',
+    summary: 'SMS messages asking users to update Digital ID level 2 via suspicious links (.apk) to install malware and hijack banking apps.',
+    source: 'Cổng thông tin Chính phủ',
+    sourceUrl: 'https://chinhphu.vn',
+    publishedAt: '2026-07-24',
+    verifiedBy: 'Department of Administrative Police',
+    affectedDemographic: 'All Citizens',
+  },
+  {
+    id: 'feed-5',
+    title: 'Impersonating Central Bank to Upgrade Transfer QR Codes',
+    category: 'Banking',
+    risk: 'high_risk',
+    summary: 'Sending fake emails claiming store QR payment codes have errors, forcing merchants to scan new QR codes that steal balances.',
+    source: 'Ngân hàng Nhà nước',
+    sourceUrl: 'https://sbv.gov.vn',
+    publishedAt: '2026-07-22',
+    verifiedBy: 'Payment Department',
+    affectedDemographic: 'Small Business Owners & Seniors',
+  },
+];
+
 let dispatchHistory: CircleDispatchLog[] = [];
 
 /**
  * Filter threat alerts by source, category, or search query
  */
 export function filterThreatAlerts(
-  alerts: ThreatAlert[] = OFFICIAL_THREAT_FEEDS,
+  alerts?: ThreatAlert[],
   options?: {
     source?: ThreatSource | 'All';
     category?: ThreatCategory | 'All';
     search?: string;
+    lang?: string;
   }
 ): ThreatAlert[] {
+  const isEn = options?.lang === 'en';
+  const defaultFeeds = isEn ? OFFICIAL_THREAT_FEEDS_EN : OFFICIAL_THREAT_FEEDS;
+  const feedList = alerts || defaultFeeds;
+
   const source = options?.source || 'All';
   const category = options?.category || 'All';
   const search = (options?.search || '').toLowerCase().trim();
 
-  return alerts.filter((item) => {
+  return feedList.filter((item) => {
     const matchSource = source === 'All' || item.source === source;
     const matchCat = category === 'All' || item.category === category;
     const matchQuery =
