@@ -87,5 +87,13 @@
       "title": "Verify OTP",
       "submit": "Confirm"
     }
+  },
+  "profile": {
+    "title": "Settings & Profile",
+    "userName": "Senior Companion",
+    "userRole": "SilverTrust Member • UNESCO MIL Advocate",
+    "accessibilityTitle": "Visual & Color Blindness Modes",
+    "languageTitle": "Language & Dialects",
+    "quickLanguage": "Quick Language Switch"
   }
 }

@@ -6,8 +6,8 @@ import en from '../locales/en.json';
 const translations = { vi, en } as const;
 
 const i18n = new I18n(translations);
-i18n.defaultLocale = 'vi';
-i18n.locale = getLocales()[0]?.languageCode ?? 'vi';
+i18n.defaultLocale = 'en';
+i18n.locale = 'en';
 i18n.enableFallback = true;
 
 /** Typed internationalization wrapper. Returns key as fallback if missing. */

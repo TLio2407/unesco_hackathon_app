@@ -43,7 +43,8 @@ export class DefaultRiskPipeline implements RiskPipeline {
     );
 
     // 3. LLM explanation (uses REDACTED text — zero PII leaves the device)
-    const llmResponse = await generateExplanation(signals, redactedText, ragRetrieval.alerts);
+    const lang = (input as any).language || 'en';
+    const llmResponse = await generateExplanation(signals, redactedText, ragRetrieval.alerts, lang);
 
     // 4. Risk scoring
     const riskLevel = scoreRisk(signals);

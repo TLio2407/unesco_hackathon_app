@@ -33,14 +33,15 @@ export type RiskLevel = z.infer<typeof RiskLevelSchema>;
  * Each variant carries only the fields it needs.
  */
 export const AnalysisInputSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('text'), text: z.string() }),
-  z.object({ kind: z.literal('url'), url: z.string().url() }),
-  z.object({ kind: z.literal('image'), ref: z.string() }),
+  z.object({ kind: z.literal('text'), text: z.string(), language: z.string().optional() }),
+  z.object({ kind: z.literal('url'), url: z.string().url(), language: z.string().optional() }),
+  z.object({ kind: z.literal('image'), ref: z.string(), language: z.string().optional() }),
   z.object({
     kind: z.literal('voice'),
     data: z.string(),
     mimeType: z.string(),
     durationMs: z.number().optional(),
+    language: z.string().optional(),
   }),
 ]);
 export type AnalysisInput = z.infer<typeof AnalysisInputSchema>;

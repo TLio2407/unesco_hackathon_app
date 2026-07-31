@@ -15,6 +15,7 @@ import { createAnalyzeClient } from '@/api/client';
 import type { AnalyzeOutput, AnalysisInput } from '@/api/contract';
 import { redact } from '@/lib/redact';
 import { t } from '@/i18n';
+import { getDialect } from '@/i18n/regional';
 import { Accessibility } from '@/theme/tokens';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
@@ -45,15 +46,16 @@ export default function CompanionScreen() {
     setError(null);
     setResult(null);
 
+    const activeLang = getDialect() === 'en' ? 'en' : 'vi';
     let input: AnalysisInput;
     if (mode === 'url') {
-      input = { kind: 'url', url: value.trim() };
+      input = { kind: 'url', url: value.trim(), language: activeLang };
     } else if (mode === 'text') {
-      input = { kind: 'text', text: redact(value).text };
+      input = { kind: 'text', text: redact(value).text, language: activeLang };
     } else if (mode === 'image' && mediaUri) {
-      input = { kind: 'image', ref: mediaUri };
+      input = { kind: 'image', ref: mediaUri, language: activeLang };
     } else if (mode === 'voice' && mediaUri) {
-      input = { kind: 'voice', data: value, mimeType: 'audio/m4a' };
+      input = { kind: 'voice', data: value, mimeType: 'audio/m4a', language: activeLang };
     } else {
       setLoading(false);
       return;

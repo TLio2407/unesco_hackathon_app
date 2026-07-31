@@ -7,6 +7,7 @@ import { Accessibility } from '@/theme/tokens';
 import { PageContainer } from '@/components/page-container';
 import { useTheme, useColorBlindnessMode } from '@/hooks/use-theme';
 import { useLanguageDialect, DIALECTS, DialectCode } from '@/i18n/regional';
+import { t } from '@/i18n';
 
 export default function ProfileScreen() {
   const theme = useTheme();
@@ -14,25 +15,25 @@ export default function ProfileScreen() {
   const [dialect, setDialect] = useLanguageDialect();
 
   const cbOptions: { key: ColorBlindnessMode; label: string; desc: string }[] = [
-    { key: 'standard', label: 'Chuẩn', desc: 'Độ tương phản cao cho người cao tuổi' },
-    { key: 'protanopia', label: 'Protanopia', desc: 'Tối ưu cho người mù màu Đỏ' },
-    { key: 'deuteranopia', label: 'Deuteranopia', desc: 'Tối ưu cho người mù màu Xanh lá' },
-    { key: 'tritanopia', label: 'Tritanopia', desc: 'Tối ưu cho người mù màu Xanh dương' },
-    { key: 'highContrast', label: 'Siêu Tương Phản', desc: 'Đen trắng tương phản tối đa cho mắt yếu' },
+    { key: 'standard', label: 'Standard', desc: 'High contrast tuned for elderly vision' },
+    { key: 'protanopia', label: 'Protanopia', desc: 'Optimized for red color blindness' },
+    { key: 'deuteranopia', label: 'Deuteranopia', desc: 'Optimized for green color blindness' },
+    { key: 'tritanopia', label: 'Tritanopia', desc: 'Optimized for blue color blindness' },
+    { key: 'highContrast', label: 'High Contrast', desc: 'Maximum contrast black & white mode' },
   ];
 
   return (
     <PageContainer>
       <ThemedText type="title" style={styles.title}>
-        Cài đặt & Hồ sơ Cá nhân
+        {t('profile.title')}
       </ThemedText>
 
       {/* User Info Header */}
       <ThemedView type="backgroundElement" style={styles.profileCard}>
         <Ionicons name="person-circle-outline" size={64} color={theme.primaryAction} />
-        <ThemedText style={styles.userName}>Cô/Chú An Tâm</ThemedText>
+        <ThemedText style={styles.userName}>{t('profile.userName')}</ThemedText>
         <ThemedText style={[styles.userRole, { color: theme.textSecondary }]}>
-          Thành viên An Tâm Số • UNESCO MIL Advocate
+          {t('profile.userRole')}
         </ThemedText>
       </ThemedView>
 
@@ -40,7 +41,7 @@ export default function ProfileScreen() {
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Ionicons name="eye-outline" size={24} color={theme.primaryAction} />
-          <ThemedText style={styles.sectionTitle}>Chế độ Mù màu & Tầm nhìn (Visual Accessibility)</ThemedText>
+          <ThemedText style={styles.sectionTitle}>{t('profile.accessibilityTitle')}</ThemedText>
         </View>
 
         <View style={styles.optionList}>
@@ -80,7 +81,7 @@ export default function ProfileScreen() {
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Ionicons name="language-outline" size={24} color={theme.primaryAction} />
-          <ThemedText style={styles.sectionTitle}>Ngôn ngữ & Vùng miền (Regional Dialects)</ThemedText>
+          <ThemedText style={styles.sectionTitle}>{t('profile.languageTitle')}</ThemedText>
         </View>
 
         <View style={styles.optionList}>

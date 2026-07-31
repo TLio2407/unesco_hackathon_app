@@ -1,9 +1,45 @@
 import { Tabs } from 'expo-router';
+import { Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/hooks/use-theme';
+import { useLanguageDialect } from '@/i18n/regional';
+import { ThemedText } from '@/components/themed-text';
+import { t } from '@/i18n';
+
+function HeaderLanguageToggle() {
+  const theme = useTheme();
+  const [dialect, setDialect] = useLanguageDialect();
+  const isEn = dialect === 'en';
+
+  return (
+    <Pressable
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: theme.surfaceElevated,
+        borderColor: theme.primaryAction,
+        borderWidth: 1.5,
+        borderRadius: 20,
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        marginRight: 12,
+        gap: 6,
+      }}
+      onPress={() => setDialect(isEn ? 'vi-north' : 'en')}
+      accessibilityRole="button"
+      accessibilityLabel={`Switch language. Current: ${isEn ? 'English' : 'Tiếng Việt'}`}>
+      <Ionicons name="globe-outline" size={16} color={theme.primaryAction} />
+      <ThemedText style={{ fontSize: 13, fontWeight: '700', color: theme.primaryAction }}>
+        {isEn ? 'EN' : 'VN'}
+      </ThemedText>
+    </Pressable>
+  );
+}
 
 export default function TabLayout() {
   const theme = useTheme();
+  const [dialect] = useLanguageDialect(); // re-render layout when language toggles
+
   return (
     <Tabs screenOptions={{
       tabBarActiveTintColor: theme.primaryAction,
@@ -30,46 +66,47 @@ export default function TabLayout() {
         fontWeight: '700',
       },
       headerTintColor: theme.text,
+      headerRight: () => <HeaderLanguageToggle />,
     }}>
       <Tabs.Screen 
         name="index" 
         options={{ 
-          title: 'Trợ lý AI', 
+          title: t('companion.title'), 
           tabBarIcon: ({ color }) => <Ionicons name="chatbubbles" size={22} color={color} /> 
         }}
       />
       <Tabs.Screen
         name="alerts"
         options={{
-          title: 'Cảnh báo',
+          title: t('alert.title'),
           tabBarIcon: ({ color }) => <Ionicons name="warning" size={22} color={color} />
         }}
       />
       <Tabs.Screen 
         name="learning" 
         options={{ 
-          title: 'Học tập', 
+          title: t('learning.title'), 
           tabBarIcon: ({ color }) => <Ionicons name="book" size={22} color={color} /> 
         }} 
       />
       <Tabs.Screen 
         name="trusted_circle" 
         options={{ 
-          title: 'Người thân', 
+          title: t('circle.title'), 
           tabBarIcon: ({ color }) => <Ionicons name="people" size={22} color={color} /> 
         }} 
       />
       <Tabs.Screen 
         name="community" 
         options={{ 
-          title: 'Cộng đồng', 
+          title: t('community.title'), 
           tabBarIcon: ({ color }) => <Ionicons name="megaphone" size={22} color={color} /> 
         }}
       />
       <Tabs.Screen 
         name="profile" 
         options={{ 
-          title: 'Cá nhân', 
+          title: t('profile.title'), 
           tabBarIcon: ({ color }) => <Ionicons name="person-circle" size={22} color={color} /> 
         }} 
       />

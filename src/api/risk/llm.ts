@@ -12,7 +12,28 @@ export type { LlmPrompt, LlmResponse };
 
 // ── Prompt templates ─────────────────────────────────────────────────────────
 
-const SYSTEM_PROMPT = `Bạn là trợ lý an toàn cho người cao tuổi Việt Nam. Nhiệm vụ: phân tích tin nhắn và báo mức độ lừa đảo.
+// ── Prompt templates ─────────────────────────────────────────────────────────
+
+const SYSTEM_PROMPT_EN = `You are a digital safety assistant for senior citizens. Your task: analyze messages/URLs for scam indicators and report the risk level.
+
+MUST RESPOND IN PLAIN, SIMPLE ENGLISH. NO TECHNICAL JARGON.
+Do NOT give medical, legal, or financial advice.
+ALWAYS advise verification through official channels.
+
+PROVIDE A CLEAR 3-PART RESPONSE:
+Part 1: Short explanation of why the message/link is suspicious.
+Part 2: Action steps - write each step on a new line starting with a hyphen (-).
+Part 3: Next action - a single summary sentence.
+
+Example structure:
+Explanation: [Reason why suspicious in 1-2 simple sentences]
+Action steps:
+- Pause for 2 minutes, do not send money or OTP immediately.
+- Open the official app or website to confirm.
+- Call the official customer hotline to verify.
+Next action: [1 short action sentence]`;
+
+const SYSTEM_PROMPT_VI = `Bạn là trợ lý an toàn cho người cao tuổi Việt Nam. Nhiệm vụ: phân tích tin nhắn và báo mức độ lừa đảo.
 
 PHẢI TRẢ VỀ TIẾNG VIỆT, ĐƠN GIẢN, KHÔNG THUẬT NGỮ KỸ THUẬT.
 KHÔNG đưa lời khuyên y tế/pháp lý/tài chính.
@@ -33,20 +54,29 @@ Hành động tiếp theo: [1 câu ngắn]`;
 
 // ── Template fallback (if LLM unavailable) ────────────────────────────────────
 
-function buildTemplateExplanation(signals: MatchedSignal[]): LlmResponse {
+function buildTemplateExplanation(signals: MatchedSignal[], lang: string = 'vi'): LlmResponse {
+  const isEn = lang === 'en';
   const explanations = signals.map((s) => s.explanation);
   const unique = [...new Set(explanations)];
+  const explanation = unique.join(' ') || (isEn ? 'Potential scam indicators detected.' : 'Phát hiện dấu hiệu đáng nghi.');
 
-  const explanation = unique.join(' ');
+  const verificationSteps = isEn
+    ? [
+        'Pause for 2 minutes. Do not send money, OTP, or passwords immediately.',
+        'Open the official website or mobile app directly (do not click links in messages).',
+        'Call the official customer service hotline to verify.',
+        'If unsure, consult a trusted family member or friend.',
+      ]
+    : [
+        'Dừng lại 2 phút, không chuyển tiền hay cung cấp thông tin ngay.',
+        'Mở app/website chính thức của cơ quan hoặc ngân hàng (không qua link trong tin nhắn).',
+        'Gọi số hotline trên website chính thức để xác nhận.',
+        'Nếu chưa chắc, hỏi con/cháu hoặc người thân tin cậy.',
+      ];
 
-  const verificationSteps = [
-    'Dừng lại 2 phút, không chuyển tiền hay cung cấp thông tin ngay.',
-    'Mở app/website chính thức của cơ quan hoặc ngân hàng (không qua link trong tin nhắn).',
-    'Gọi số hotline trên website chính thức để xác nhận.',
-    'Nếu chưa chắc, hỏi con/cháu hoặc người thân tin cậy.',
-  ];
-
-  const nextAction = 'Dừng lại 2 phút – Không chuyển tiền ngay – Xác nhận qua kênh độc lập.';
+  const nextAction = isEn
+    ? 'Pause – Do not transfer money immediately – Verify via official channels.'
+    : 'Dừng lại 2 phút – Không chuyển tiền ngay – Xác nhận qua kênh độc lập.';
 
   return { explanation, verificationSteps, nextAction };
 }
@@ -60,9 +90,8 @@ export interface LlmClient {
 // Mock client for testing
 export class MockLlmClient implements LlmClient {
   async generate(prompt: LlmPrompt): Promise<LlmResponse> {
-    // Extract signals from prompt (simple regex)
     const signals: MatchedSignal[] = [];
-    const match = prompt.user.match(/Dấu hiệu: ([\w,]+)/);
+    const match = prompt.user.match(/Dấu hiệu: ([\w,]+)/) || prompt.user.match(/Signals: ([\w,]+)/);
     if (match) {
       const sigs = match[1].split(',').map((s) => s.trim() as any);
       for (const sig of sigs) {
@@ -72,7 +101,8 @@ export class MockLlmClient implements LlmClient {
         }
       }
     }
-    return buildTemplateExplanation(signals);
+    const isEn = prompt.system.includes('ENGLISH');
+    return buildTemplateExplanation(signals, isEn ? 'en' : 'vi');
   }
 }
 
@@ -81,7 +111,6 @@ export class MockLlmClient implements LlmClient {
 let _llmClient: LlmClient | undefined;
 
 async function loadLlmClient(): Promise<LlmClient> {
-  // Try real Google AI Studio client first
   try {
     const { getGoogleAiClient } = await import('../llm-client');
     const client = getGoogleAiClient();
@@ -102,28 +131,33 @@ async function loadLlmClient(): Promise<LlmClient> {
 export async function generateExplanation(
   signals: MatchedSignal[],
   text: string,
-  _ragContext?: any[], // TrustedAlert[] from WP4
+  _ragContext?: any[],
+  lang: string = 'vi',
 ): Promise<LlmResponse> {
+  const isEn = lang === 'en';
   if (signals.length === 0) {
     return {
-      explanation: 'Không phát hiện dấu hiệu đáng nghi.',
+      explanation: isEn ? 'No suspicious scam indicators detected.' : 'Không phát hiện dấu hiệu đáng nghi.',
       verificationSteps: [],
-      nextAction: 'Tin nhắn an toàn.',
+      nextAction: isEn ? 'Message appears safe.' : 'Tin nhắn an toàn.',
     };
   }
 
   const signalList = signals.map((s) => s.signal).join(', ');
+  const userPrompt = isEn
+    ? `Language: English\nSignals: ${signalList}\n\nMessage content: ${text}`
+    : `Dấu hiệu: ${signalList}\n\nNội dung tin nhắn: ${text}`;
 
-  const userPrompt = `Dấu hiệu: ${signalList}\n\nNội dung tin nhắn: ${text}`;
-
-  const prompt: LlmPrompt = { system: SYSTEM_PROMPT, user: userPrompt };
+  const prompt: LlmPrompt = {
+    system: isEn ? SYSTEM_PROMPT_EN : SYSTEM_PROMPT_VI,
+    user: userPrompt,
+  };
 
   try {
     const client = await loadLlmClient();
     return await client.generate(prompt);
   } catch {
-    // Fallback to template when LLM unavailable or fails
-    return buildTemplateExplanation(signals);
+    return buildTemplateExplanation(signals, lang);
   }
 }
 

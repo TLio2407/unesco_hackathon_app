@@ -87,5 +87,13 @@
       "title": "Xác thực OTP",
       "submit": "Xác nhận"
     }
+  },
+  "profile": {
+    "title": "Cài đặt & Hồ sơ Cá nhân",
+    "userName": "Cô/Chú An Tâm",
+    "userRole": "Thành viên An Tâm Số • UNESCO MIL Advocate",
+    "accessibilityTitle": "Chế độ Mù màu & Tầm nhìn (Visual Accessibility)",
+    "languageTitle": "Ngôn ngữ & Vùng miền (Regional Dialects)",
+    "quickLanguage": "Đổi nhanh ngôn ngữ"
   }
 }

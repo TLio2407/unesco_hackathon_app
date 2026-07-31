@@ -87,7 +87,7 @@ export const SIMPLIFIED_GLOSSARY: Record<string, GlossaryTerm> = {
   },
 };
 
-let currentDialect: DialectCode = 'vi-north';
+let currentDialect: DialectCode = 'en';
 const dialectListeners = new Set<(dialect: DialectCode) => void>();
 
 export function getDialect(): DialectCode {
