@@ -1,6 +1,9 @@
 import { vi } from 'vitest';
 import React from 'react';
 
+// Ensure __DEV__ is defined for Expo modules in test environment
+(globalThis as any).__DEV__ = true;
+
 vi.mock('@/i18n', () => {
   const t = (key: string, fallback?: string) => fallback ?? key;
   return {
@@ -17,4 +20,10 @@ vi.mock('expo-localization', () => ({
 
 vi.mock('@expo/vector-icons', () => ({
   Ionicons: (p: any) => React.createElement('i', p),
+}));
+
+vi.mock('expo-speech', () => ({
+  speak: vi.fn(),
+  stop: vi.fn().mockResolvedValue(undefined),
+  isSpeakingAsync: vi.fn().mockResolvedValue(false),
 }));

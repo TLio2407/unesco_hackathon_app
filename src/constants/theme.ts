@@ -56,6 +56,65 @@ export const Colors = {
   },
 } as const;
 
+export type ColorBlindnessMode = 'standard' | 'protanopia' | 'deuteranopia' | 'tritanopia' | 'highContrast';
+
+export function getColorPalette(theme: 'light' | 'dark', mode: ColorBlindnessMode = 'standard') {
+  const base = Colors[theme];
+  if (mode === 'standard') return base;
+
+  if (mode === 'protanopia') {
+    // Red-blind: replace red with magenta/purple and high-contrast gold
+    return {
+      ...base,
+      riskHigh: theme === 'dark' ? '#E879F9' : '#C026D3', // Magenta
+      riskHighBg: theme === 'dark' ? '#3B0764' : '#FDF4FF',
+      riskCaution: theme === 'dark' ? '#FACC15' : '#D97706',
+      primaryAction: theme === 'dark' ? '#38BDF8' : '#0284C7',
+    };
+  }
+
+  if (mode === 'deuteranopia') {
+    // Green-blind: replace green with bright cyan/blue and orange for high risk
+    return {
+      ...base,
+      riskSafe: theme === 'dark' ? '#38BDF8' : '#0284C7', // Cyan Blue
+      riskSafeBg: theme === 'dark' ? '#0C4A6E' : '#F0F9FF',
+      riskHigh: theme === 'dark' ? '#FB923C' : '#EA580C', // Warm Orange
+      riskHighBg: theme === 'dark' ? '#431407' : '#FFF7ED',
+    };
+  }
+
+  if (mode === 'tritanopia') {
+    // Blue-blind: replace blue with deep teal/cyan, high risk teal-red
+    return {
+      ...base,
+      primaryAction: theme === 'dark' ? '#2DD4BF' : '#0D9488', // Teal
+      riskSafe: theme === 'dark' ? '#2DD4BF' : '#0D9488',
+      riskSafeBg: theme === 'dark' ? '#042F2E' : '#F0FDFA',
+      riskHigh: theme === 'dark' ? '#F43F5E' : '#E11D48', // Rose Red
+    };
+  }
+
+  if (mode === 'highContrast') {
+    // Maximum contrast for low vision
+    return {
+      ...base,
+      background: theme === 'dark' ? '#000000' : '#FFFFFF',
+      text: theme === 'dark' ? '#FFFFFF' : '#000000',
+      textSecondary: theme === 'dark' ? '#E2E8F0' : '#1E293B',
+      surfaceCard: theme === 'dark' ? '#121212' : '#F8FAFC',
+      cardBorder: theme === 'dark' ? '#FFFFFF' : '#000000',
+      primaryAction: '#0055FF',
+      primaryActionText: '#FFFFFF',
+      riskHigh: '#FF0000',
+      riskCaution: '#D97706',
+      riskSafe: '#008000',
+    };
+  }
+
+  return base;
+}
+
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 
 export const Fonts = Platform.select({

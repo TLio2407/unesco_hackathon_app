@@ -1,4 +1,5 @@
 import { RiskLevel } from '@/api/contract';
+import { Colors } from '@/constants/theme';
 import { Accessibility } from '@/theme/tokens';
 
 /**
@@ -33,34 +34,35 @@ export const RiskLevels = {
 
 export type RiskLevelKey = keyof typeof RiskLevels;
 
-export function riskMeta(level: RiskLevel, theme: any) {
+export function riskMeta(level: RiskLevel, theme: any = Colors.light) {
+  const activeTheme = theme || Colors.light;
   switch (level) {
     case 'high_risk':
       return {
         labelKey: 'companion.result.highRisk',
-        color: theme.riskHigh,
-        background: theme.riskHighBg || '#FEF2F2',
+        color: activeTheme.riskHigh,
+        background: activeTheme.riskHighBg || '#FEF2F2',
         icon: 'alert-circle' as const,
       };
     case 'caution':
       return {
         labelKey: 'companion.result.caution',
-        color: theme.riskCaution,
-        background: theme.riskCautionBg || '#FFFBEB',
+        color: activeTheme.riskCaution,
+        background: activeTheme.riskCautionBg || '#FFFBEB',
         icon: 'warning' as const,
       };
     case 'safe':
       return {
         labelKey: 'companion.result.safe',
-        color: theme.riskSafe,
-        background: theme.riskSafeBg || '#F0FDF4',
+        color: activeTheme.riskSafe,
+        background: activeTheme.riskSafeBg || '#F0FDF4',
         icon: 'shield-checkmark' as const,
       };
     default:
       return {
         labelKey: 'companion.result.insufficientData',
-        color: theme.riskInsufficient,
-        background: theme.riskInsufficientBg || '#F1F5F9',
+        color: activeTheme.riskInsufficient,
+        background: activeTheme.riskInsufficientBg || '#F1F5F9',
         icon: 'help-circle' as const,
       };
   }

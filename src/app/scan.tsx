@@ -79,9 +79,9 @@ export default function ScanScreen() {
         ref={cameraRef}
         onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
         barcodeScannerSettings={{
-          barcodes: ['qr_code'],
+          barcodeTypes: ['qr'],
         }}
-        style={StyleSheet.absoluteFillObject}
+        style={StyleSheet.absoluteFill}
       />
       <View style={styles.overlay}>
         <View style={styles.scanFrame}>

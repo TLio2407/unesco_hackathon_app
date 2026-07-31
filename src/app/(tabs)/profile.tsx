@@ -1,46 +1,162 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View, Pressable, ScrollView } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Spacing } from '@/constants/theme';
+import { Spacing, ColorBlindnessMode } from '@/constants/theme';
+import { Accessibility } from '@/theme/tokens';
 import { PageContainer } from '@/components/page-container';
+import { useTheme, useColorBlindnessMode } from '@/hooks/use-theme';
+import { useLanguageDialect, DIALECTS, DialectCode } from '@/i18n/regional';
 
 export default function ProfileScreen() {
+  const theme = useTheme();
+  const [cbMode, setCbMode] = useColorBlindnessMode();
+  const [dialect, setDialect] = useLanguageDialect();
+
+  const cbOptions: { key: ColorBlindnessMode; label: string; desc: string }[] = [
+    { key: 'standard', label: 'Chuẩn', desc: 'Độ tương phản cao cho người cao tuổi' },
+    { key: 'protanopia', label: 'Protanopia', desc: 'Tối ưu cho người mù màu Đỏ' },
+    { key: 'deuteranopia', label: 'Deuteranopia', desc: 'Tối ưu cho người mù màu Xanh lá' },
+    { key: 'tritanopia', label: 'Tritanopia', desc: 'Tối ưu cho người mù màu Xanh dương' },
+    { key: 'highContrast', label: 'Siêu Tương Phản', desc: 'Đen trắng tương phản tối đa cho mắt yếu' },
+  ];
+
   return (
     <PageContainer>
-      <ThemedText type="subtitle">My Profile</ThemedText>
+      <ThemedText type="title" style={styles.title}>
+        Cài đặt & Hồ sơ Cá nhân
+      </ThemedText>
 
+      {/* User Info Header */}
       <ThemedView type="backgroundElement" style={styles.profileCard}>
-        <ThemedText type="smallBold">John Doe</ThemedText>
-        <ThemedText type="small">MIL Advocate</ThemedText>
+        <Ionicons name="person-circle-outline" size={64} color={theme.primaryAction} />
+        <ThemedText style={styles.userName}>Cô/Chú An Tâm</ThemedText>
+        <ThemedText style={[styles.userRole, { color: theme.textSecondary }]}>
+          Thành viên An Tâm Số • UNESCO MIL Advocate
+        </ThemedText>
       </ThemedView>
 
-      <ThemedText type="smallBold">Participation</ThemedText>
-      <ThemedView type="backgroundElement" style={styles.infoRow}>
-        <ThemedText type="small">Team Status:</ThemedText>
-        <ThemedText type="smallBold">Joined "MIL Rangers"</ThemedText>
-      </ThemedView>
+      {/* Accessibility: Color Blindness Modes */}
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Ionicons name="eye-outline" size={24} color={theme.primaryAction} />
+          <ThemedText style={styles.sectionTitle}>Chế độ Mù màu & Tầm nhìn (Visual Accessibility)</ThemedText>
+        </View>
 
-      <ThemedView type="backgroundElement" style={styles.infoRow}>
-        <ThemedText type="small">Hackathon Entry:</ThemedText>
-        <ThemedText type="smallBold">In Progress</ThemedText>
+        <View style={styles.optionList}>
+          {cbOptions.map((opt) => {
+            const isActive = cbMode === opt.key;
+            return (
+              <Pressable
+                key={opt.key}
+                style={[
+                  styles.optionCard,
+                  {
+                    backgroundColor: isActive ? theme.surfaceElevated : theme.surfaceCard,
+                    borderColor: isActive ? theme.primaryAction : theme.cardBorder,
+                    borderWidth: isActive ? 2 : 1,
+                  },
+                ]}
+                onPress={() => setCbMode(opt.key)}
+                accessibilityRole="radio"
+                accessibilityState={{ selected: isActive }}
+                accessibilityLabel={`Chế độ hiển thị: ${opt.label}`}>
+                <View style={{ flex: 1 }}>
+                  <ThemedText style={[styles.optionLabel, isActive && { color: theme.primaryAction }]}>
+                    {opt.label}
+                  </ThemedText>
+                  <ThemedText style={[styles.optionDesc, { color: theme.textSecondary }]}>
+                    {opt.desc}
+                  </ThemedText>
+                </View>
+                {isActive && <Ionicons name="checkmark-circle" size={24} color={theme.primaryAction} />}
+              </Pressable>
+            );
+          })}
+        </View>
+      </View>
+
+      {/* Language & Regional Dialects */}
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Ionicons name="language-outline" size={24} color={theme.primaryAction} />
+          <ThemedText style={styles.sectionTitle}>Ngôn ngữ & Vùng miền (Regional Dialects)</ThemedText>
+        </View>
+
+        <View style={styles.optionList}>
+          {Object.values(DIALECTS).map((d) => {
+            const isActive = dialect === d.code;
+            return (
+              <Pressable
+                key={d.code}
+                style={[
+                  styles.optionCard,
+                  {
+                    backgroundColor: isActive ? theme.surfaceElevated : theme.surfaceCard,
+                    borderColor: isActive ? theme.primaryAction : theme.cardBorder,
+                    borderWidth: isActive ? 2 : 1,
+                  },
+                ]}
+                onPress={() => setDialect(d.code)}
+                accessibilityRole="radio"
+                accessibilityState={{ selected: isActive }}
+                accessibilityLabel={`Ngôn ngữ: ${d.name}`}>
+                <View style={{ flex: 1 }}>
+                  <ThemedText style={[styles.optionLabel, isActive && { color: theme.primaryAction }]}>
+                    {d.name}
+                  </ThemedText>
+                  <ThemedText style={[styles.optionDesc, { color: theme.textSecondary }]}>
+                    Cách xưng hô thân mật: "{d.addressUser}"
+                  </ThemedText>
+                </View>
+                {isActive && <Ionicons name="checkmark-circle" size={24} color={theme.primaryAction} />}
+              </Pressable>
+            );
+          })}
+        </View>
+      </View>
+
+      {/* App Info */}
+      <ThemedView type="backgroundElement" style={styles.infoCard}>
+        <ThemedText style={styles.infoTitle}>An Tâm Số — UNESCO Youth Hackathon 2026</ThemedText>
+        <ThemedText style={[styles.infoText, { color: theme.textSecondary }]}>
+          Phiên bản 1.0.0 (WP4 Extended Edition) • Ứng dụng đồng hành tin cậy nâng cao năng lực truyền thông & số (MIL) cho người cao tuổi.
+        </ThemedText>
       </ThemedView>
     </PageContainer>
   );
 }
 
 const styles = StyleSheet.create({
+  title: { fontSize: Accessibility.fontSize.title, marginBottom: Spacing.two },
   profileCard: {
     padding: Spacing.four,
-    borderRadius: Spacing.three,
+    borderRadius: Spacing.four,
     alignItems: 'center',
-    marginBottom: Spacing.two,
-    marginTop: Spacing.two,
+    gap: Spacing.one,
+    marginBottom: Spacing.three,
   },
-  infoRow: {
+  userName: { fontSize: Accessibility.fontSize.large, fontWeight: '700' },
+  userRole: { fontSize: Accessibility.fontSize.small },
+  section: { gap: Spacing.two, marginBottom: Spacing.three },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
+  sectionTitle: { fontSize: Accessibility.fontSize.large, fontWeight: '700', flex: 1 },
+  optionList: { gap: Spacing.two },
+  optionCard: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    alignItems: 'center',
     padding: Spacing.three,
-    borderRadius: Spacing.two,
+    borderRadius: Spacing.three,
+    minHeight: Accessibility.minTouchSize,
+  },
+  optionLabel: { fontSize: Accessibility.fontSize.normal, fontWeight: '700' },
+  optionDesc: { fontSize: Accessibility.fontSize.small, marginTop: 2 },
+  infoCard: {
+    padding: Spacing.three,
+    borderRadius: Spacing.three,
+    gap: Spacing.one,
     marginTop: Spacing.two,
   },
+  infoTitle: { fontSize: Accessibility.fontSize.normal, fontWeight: '700' },
+  infoText: { fontSize: Accessibility.fontSize.small, lineHeight: 20 },
 });

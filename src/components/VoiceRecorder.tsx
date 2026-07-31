@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Pressable, StyleSheet, useState } from 'react';
+import { useState } from 'react';
+import { Pressable, StyleSheet } from 'react-native';
 
 import { Spacing } from '@/constants/theme';
 import { t } from '@/i18n';
@@ -14,6 +15,7 @@ interface VoiceRecorderProps {
 export function VoiceRecorderButton({ onRecordingComplete, disabled }: VoiceRecorderProps) {
   const [recording, setRecording] = useState<any>(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [duration, setDuration] = useState(0);
 
   async function startRecording() {
     try {
@@ -33,6 +35,7 @@ export function VoiceRecorderButton({ onRecordingComplete, disabled }: VoiceReco
       );
       setRecording(recording);
       setIsRecording(true);
+      setDuration(0);
     } catch (err) {
       console.error('Failed to start recording', err);
     }

@@ -9,6 +9,7 @@ import { Accessibility } from '@/theme/tokens';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { PageContainer } from '@/components/page-container';
+import { getDispatchHistory } from '@/lib/threat-feeds';
 
 const MOCK_CONTACTS = [
   { id: '1', name: 'Con trai (Minh)', phone: '0901234567' },
@@ -21,6 +22,8 @@ export default function CircleScreen() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
+
+  const dispatchHistory = getDispatchHistory();
 
   const handleAdd = () => {
     if (!newName.trim() || !newPhone.trim()) {
@@ -48,8 +51,8 @@ export default function CircleScreen() {
           text: t('common.confirm'),
           style: 'destructive',
           onPress: () => {
-            setContacts(contacts.filter(c => c.id !== id));
-          }
+            setContacts(contacts.filter((c) => c.id !== id));
+          },
         },
       ]
     );
@@ -58,31 +61,35 @@ export default function CircleScreen() {
   return (
     <PageContainer>
       <ThemedText type="title" style={styles.title}>
-        {t('circle.title')}
+        {t('circle.title')} (Vòng tròn Người thân)
       </ThemedText>
 
-      <ThemedText style={styles.body}>
-        {t('circle.placeholder')}
-      </ThemedText>
+      <ThemedText style={styles.body}>{t('circle.placeholder')}</ThemedText>
 
       <View style={styles.contactsList}>
-        {contacts.map(contact => (
+        {contacts.map((contact) => (
           <ThemedView key={contact.id} type="backgroundElement" style={styles.contactCard}>
             <View style={styles.contactInfo}>
               <Ionicons name="person-circle" size={48} color={theme.primaryAction} />
               <View>
                 <ThemedText style={styles.contactName}>{contact.name}</ThemedText>
-                <ThemedText style={[styles.contactPhone, { color: theme.textSecondary }]}>{contact.phone}</ThemedText>
+                <ThemedText style={[styles.contactPhone, { color: theme.textSecondary }]}>
+                  {contact.phone}
+                </ThemedText>
               </View>
             </View>
             <View style={styles.cardActions}>
-              <Pressable style={[styles.actionBtn, { backgroundColor: theme.primaryAction }]}>
+              <Pressable
+                style={[styles.actionBtn, { backgroundColor: theme.primaryAction }]}
+                accessibilityRole="button"
+                accessibilityLabel={`Nhắn tin cho ${contact.name}`}>
                 <Ionicons name="chatbubble-ellipses" size={24} color={theme.primaryActionText} />
               </Pressable>
               <Pressable
                 style={[styles.actionBtn, { backgroundColor: theme.riskHigh }]}
                 onPress={() => handleDelete(contact.id)}
-              >
+                accessibilityRole="button"
+                accessibilityLabel={`Xóa ${contact.name}`}>
                 <Ionicons name="trash" size={24} color="#FFF" />
               </Pressable>
             </View>
@@ -90,9 +97,15 @@ export default function CircleScreen() {
         ))}
       </View>
 
-      <Pressable style={[styles.addBtn, { backgroundColor: theme.primaryAction }]} onPress={() => setIsModalVisible(true)}>
+      <Pressable
+        style={[styles.addBtn, { backgroundColor: theme.primaryAction }]}
+        onPress={() => setIsModalVisible(true)}
+        accessibilityRole="button"
+        accessibilityLabel="Thêm người thân mới">
         <Ionicons name="add-circle" size={28} color={theme.primaryActionText} />
-        <ThemedText style={[styles.addBtnText, { color: theme.primaryActionText }]}>{t('circle.addContact')}</ThemedText>
+        <ThemedText style={[styles.addBtnText, { color: theme.primaryActionText }]}>
+          {t('circle.addContact')}
+        </ThemedText>
       </Pressable>
 
       <View style={[styles.privacyNote, { backgroundColor: theme.riskSafeBg, borderColor: theme.riskSafe }]}>
@@ -102,12 +115,31 @@ export default function CircleScreen() {
         </ThemedText>
       </View>
 
+      {/* Dispatch History */}
+      {dispatchHistory.length > 0 && (
+        <View style={styles.historySection}>
+          <ThemedText type="subtitle" style={styles.historyTitle}>
+            Lịch sử Cảnh báo đã gửi gần đây ({dispatchHistory.length})
+          </ThemedText>
+          {dispatchHistory.map((item) => (
+            <ThemedView key={item.id} type="backgroundElement" style={styles.historyCard}>
+              <Ionicons name="megaphone-outline" size={24} color={theme.primaryAction} />
+              <View style={{ flex: 1 }}>
+                <ThemedText style={styles.historyAlertTitle}>{item.alertTitle}</ThemedText>
+                <ThemedText style={[styles.historyMeta, { color: theme.textSecondary }]}>
+                  Đã gửi đến {item.recipientsCount} người thân • {new Date(item.dispatchedAt).toLocaleTimeString()}
+                </ThemedText>
+              </View>
+            </ThemedView>
+          ))}
+        </View>
+      )}
+
       <Modal
         visible={isModalVisible}
         transparent
         animationType="slide"
-        onRequestClose={() => setIsModalVisible(false)}
-      >
+        onRequestClose={() => setIsModalVisible(false)}>
         <View style={styles.modalOverlay}>
           <ThemedView style={[styles.modalContent, { backgroundColor: theme.surfaceCard, borderColor: theme.cardBorder }]}>
             <ThemedText style={styles.modalTitle}>{t('circle.addContactTitle')}</ThemedText>
@@ -138,15 +170,17 @@ export default function CircleScreen() {
             <View style={styles.modalButtons}>
               <Pressable
                 style={[styles.modalButton, { backgroundColor: theme.backgroundElement }]}
-                onPress={() => setIsModalVisible(false)}
-              >
-                <ThemedText style={[styles.cancelButtonText, { color: theme.text }]}>{t('common.cancel')}</ThemedText>
+                onPress={() => setIsModalVisible(false)}>
+                <ThemedText style={[styles.cancelButtonText, { color: theme.text }]}>
+                  {t('common.cancel')}
+                </ThemedText>
               </Pressable>
               <Pressable
                 style={[styles.modalButton, { backgroundColor: theme.primaryAction }]}
-                onPress={handleAdd}
-              >
-                <ThemedText style={[styles.confirmButtonText, { color: theme.primaryActionText }]}>{t('common.confirm')}</ThemedText>
+                onPress={handleAdd}>
+                <ThemedText style={[styles.confirmButtonText, { color: theme.primaryActionText }]}>
+                  {t('common.confirm')}
+                </ThemedText>
               </Pressable>
             </View>
           </ThemedView>
@@ -203,6 +237,17 @@ const styles = StyleSheet.create({
     marginTop: Spacing.two,
   },
   privacyText: { flex: 1, fontSize: Accessibility.fontSize.small },
+  historySection: { marginTop: Spacing.four, gap: Spacing.two },
+  historyTitle: { fontSize: Accessibility.fontSize.large, fontWeight: '700' },
+  historyCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+    padding: Spacing.three,
+    borderRadius: Spacing.three,
+  },
+  historyAlertTitle: { fontSize: Accessibility.fontSize.normal, fontWeight: '700' },
+  historyMeta: { fontSize: Accessibility.fontSize.small },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.6)',
@@ -218,10 +263,6 @@ const styles = StyleSheet.create({
     gap: Spacing.four,
     borderWidth: 1,
     elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
   },
   modalTitle: {
     fontSize: Accessibility.fontSize.large,

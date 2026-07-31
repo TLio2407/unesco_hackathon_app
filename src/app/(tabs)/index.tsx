@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, TextInput, View, Image, Share, useWindowDimensions } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, TextInput, View, Image, Share, useWindowDimensions, DimensionValue } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { LessonCard } from '@/components/lesson-card';
@@ -7,6 +7,10 @@ import { RedFlagList } from '@/components/red-flag-list';
 import { RiskBadge } from '@/components/risk-badge';
 import { ThemedText } from '@/components/themed-text';
 import { ImagePickerButton } from '@/components/ImagePicker';
+import { AudioReadback } from '@/components/audio-readback';
+import { SimplifiedGlossary } from '@/components/simplified-glossary';
+import { DualPane } from '@/components/dual-pane';
+import { useResponsive } from '@/hooks/use-responsive';
 import { createAnalyzeClient } from '@/api/client';
 import type { AnalyzeOutput, AnalysisInput } from '@/api/contract';
 import { redact } from '@/lib/redact';
@@ -22,6 +26,8 @@ type Mode = 'text' | 'url' | 'image' | 'voice';
 export default function CompanionScreen() {
   const theme = useTheme();
   const { width } = useWindowDimensions();
+  const { isWide } = useResponsive();
+
   const [mode, setMode] = useState<Mode>('text');
   const [value, setValue] = useState('');
   const [mediaUri, setMediaUri] = useState<string | null>(null);
@@ -31,7 +37,7 @@ export default function CompanionScreen() {
   const [isRecording, setIsRecording] = useState(false);
 
   const numColumns = width > 600 ? 4 : 2;
-  const btnWidth = `${(100 / numColumns) - 2}%`;
+  const btnWidth = `${(100 / numColumns) - 2}%` as DimensionValue;
 
   async function onSubmit() {
     if (loading) return;
@@ -75,8 +81,8 @@ export default function CompanionScreen() {
     }
   };
 
-  return (
-    <PageContainer>
+  const inputPane = (
+    <View style={styles.paneContent}>
       <ThemedText type="subtitle" style={styles.title}>
         {t('companion.title')}
       </ThemedText>
@@ -104,7 +110,8 @@ export default function CompanionScreen() {
         <Pressable
           style={[styles.modeBtn, { borderColor: theme.primaryAction, backgroundColor: theme.surfaceCard, width: btnWidth }, isRecording && { backgroundColor: theme.riskHigh, borderColor: theme.riskHigh }]}
           onPress={handleVoicePress}
-        >
+          accessibilityRole="button"
+          accessibilityLabel={isRecording ? 'Dừng ghi âm' : 'Ghi âm giọng nói'}>
            <Ionicons
              name={isRecording ? "stop-circle" : "mic-outline"}
              size={32}
@@ -127,6 +134,7 @@ export default function CompanionScreen() {
           textAlignVertical="top"
           autoCapitalize="none"
           keyboardType={mode === 'url' ? 'url' : 'default'}
+          accessibilityLabel="Nội dung cần phân tích"
         />
       )}
 
@@ -154,7 +162,9 @@ export default function CompanionScreen() {
       <Pressable
         style={({ pressed }) => [styles.submit, { backgroundColor: theme.primaryAction }, pressed && styles.submitPressed]}
         onPress={onSubmit}
-        disabled={loading || (mode === 'text' || mode === 'url' ? !value.trim() : !mediaUri)}>
+        disabled={loading || (mode === 'text' || mode === 'url' ? !value.trim() : !mediaUri)}
+        accessibilityRole="button"
+        accessibilityLabel="Phân tích mức độ rủi ro">
         <ThemedText style={[styles.submitText, { color: theme.primaryActionText }]}>
           {loading ? t('common.loading') : t('companion.submit')}
         </ThemedText>
@@ -165,7 +175,22 @@ export default function CompanionScreen() {
         <ThemedText style={[styles.body, { color: theme.riskHigh }]}>{error}</ThemedText>
       )}
 
-      {result && <ResultCard result={result} />}
+      <SimplifiedGlossary />
+    </View>
+  );
+
+  const resultPane = result ? <ResultCard result={result} /> : null;
+
+  return (
+    <PageContainer>
+      {isWide ? (
+        <DualPane master={inputPane} detail={resultPane} />
+      ) : (
+        <View style={styles.mobileWrap}>
+          {inputPane}
+          {resultPane}
+        </View>
+      )}
     </PageContainer>
   );
 }
@@ -180,7 +205,9 @@ function ModeButton({ active, label, icon, width, onPress }: { active: boolean; 
         active && { backgroundColor: theme.primaryAction },
         pressed && styles.modeBtnPressed,
       ]}
-      onPress={onPress}>
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={label}>
       <Ionicons name={icon} size={32} color={active ? theme.primaryActionText : theme.primaryAction} />
       <ThemedText style={[styles.modeLabel, active && { color: theme.primaryActionText }]}>
         {label}
@@ -191,6 +218,7 @@ function ModeButton({ active, label, icon, width, onPress }: { active: boolean; 
 
 function ResultCard({ result }: { result: AnalyzeOutput }) {
   const theme = useTheme();
+
   async function onShare() {
     const summary = `An Tâm Số - Kết quả phân tích rủi ro: ${t(`risk.${result.riskLevel}`)}\n\n` +
       `Dấu hiệu:\n${result.redFlags.map(f => `- ${f.explanation}`).join('\n')}\n\n` +
@@ -199,9 +227,16 @@ function ResultCard({ result }: { result: AnalyzeOutput }) {
     await Share.share({ message: redact(summary).text });
   }
 
+  const audioReadText = `Kết quả phân tích rủi ro: ${t(`risk.${result.riskLevel}`)}. ` +
+    `Hành động tiếp theo: ${result.nextAction}. ` +
+    `Các bước kiểm chứng: ${result.verificationSteps.join('. ')}.`;
+
   return (
     <View style={styles.result}>
       <RiskBadge level={result.riskLevel} />
+      
+      <AudioReadback text={audioReadText} label="Đọc kết quả phân tích" />
+
       <RedFlagList flags={result.redFlags} />
 
       {result.verificationSteps.length > 0 && (
@@ -217,7 +252,11 @@ function ResultCard({ result }: { result: AnalyzeOutput }) {
         </View>
       )}
 
-      <Pressable style={[styles.shareBtn, { backgroundColor: theme.primaryAction }]} onPress={onShare}>
+      <Pressable
+        style={[styles.shareBtn, { backgroundColor: theme.primaryAction }]}
+        onPress={onShare}
+        accessibilityRole="button"
+        accessibilityLabel="Chia sẻ tình huống cho người thân">
         <Ionicons name="share-social" size={24} color={theme.primaryActionText} />
         <ThemedText style={[styles.shareBtnText, { color: theme.primaryActionText }]}>{t('companion.trustedCircle')}</ThemedText>
       </Pressable>
@@ -248,6 +287,8 @@ function Section({ titleKey, items }: { titleKey: string; items: string[] }) {
 }
 
 const styles = StyleSheet.create({
+  paneContent: { flex: 1, gap: Spacing.three },
+  mobileWrap: { flex: 1, gap: Spacing.four },
   title: { fontSize: Accessibility.fontSize.title, marginBottom: Spacing.two },
   modeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two, justifyContent: 'center' },
   modeBtn: {
