@@ -18,13 +18,16 @@ function getBaseUrl(): string {
   if (typeof process !== 'undefined' && process.env?.EXPO_PUBLIC_API_BASE_URL) {
     return process.env.EXPO_PUBLIC_API_BASE_URL;
   }
-  // Browser client-side fallback (for relative routing behind Nginx reverse proxy)
+  // Browser client-side: relative routing behind Nginx when on production domain
   const win = (globalThis as any).window;
   if (typeof win !== 'undefined' && win.location && win.location.origin) {
-    return win.location.origin;
+    const origin = win.location.origin;
+    if (!origin.includes(':8081') && !origin.includes(':19006') && !origin.includes(':8082') && !origin.includes('localhost')) {
+      return origin;
+    }
   }
-  // Deployed public API endpoint fallback
-  return 'https://unesco-api.w9.nu';
+  // Deployed public AI API endpoint fallback
+  return 'https://unesco.w9.nu';
 }
 
 
